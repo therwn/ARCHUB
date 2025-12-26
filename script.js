@@ -204,9 +204,10 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
       this.setupKeyboardControls();
       this.bindEvents();
       // Noise canvas lazy load - START butonuna basıldığında başlatılacak
-      this.loadRegionsFromStorage(); // Kaydedilmiş bölgeleri yükle
-      this.loadTierListFromStorage(); // Kaydedilmiş tier list öğelerini yükle
-      this.loadExternalResourcesFromStorage(); // Kaydedilmiş dış kaynakları yükle
+      // API'den veri yükle (async - blocking değil)
+      this.fetchRegions().catch(err => console.warn('Failed to fetch regions:', err));
+      this.fetchTierListItems().catch(err => console.warn('Failed to fetch tier list:', err));
+      this.fetchExternalResources().catch(err => console.warn('Failed to fetch external resources:', err));
       this.setupModalHandlers();
       this.setupNavClickHandlers();
       this.setupAudioWave();
@@ -2324,10 +2325,10 @@ void main(){
     },
     
     async deleteExternalResourceFromAPI(id) {
+      // ID'yi string'e çevir (MongoDB ObjectId için)
+      const idStr = id?.toString() || id;
+      
       try {
-        // ID'yi string'e çevir (MongoDB ObjectId için)
-        const idStr = id?.toString() || id;
-        
         // Eğer ID sayısal ise (eski LocalStorage verisi), MongoDB'de bulunamaz
         // Bu durumda sadece LocalStorage'dan sil
         if (!isNaN(idStr) && idStr.length < 24) {
@@ -2349,7 +2350,7 @@ void main(){
         this.renderExternalResources();
       } catch (error) {
         console.error('Error deleting external resource:', error);
-        // Fallback to localStorage
+        // Fallback to localStorage - her durumda LocalStorage'dan da sil
         this.externalResources = this.externalResources.filter(r => (r.id?.toString() || r.id) !== idStr && r._id?.toString() !== idStr);
         localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
         this.renderExternalResources();
