@@ -1,4 +1,7 @@
-import { sql } from '@vercel/postgres';
+import { MongoClient, ObjectId } from 'mongodb';
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
   // CORS headers
@@ -14,40 +17,55 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   try {
+    await client.connect();
+    const db = client.db('archub');
+    const collection = db.collection('tier_list');
+
+    // MongoDB ObjectId'ye çevir
+    let objectId;
+    try {
+      objectId = new ObjectId(id);
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid ID format' });
+    }
+
     if (req.method === 'GET') {
       // Tek bir tier list öğesini getir
-      const { rows } = await sql`SELECT * FROM tier_list WHERE id = ${id}`;
-      if (rows.length === 0) {
+      const item = await collection.findOne({ _id: objectId });
+      if (!item) {
         return res.status(404).json({ error: 'Tier list item not found' });
       }
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...item, id: item._id });
     }
 
     if (req.method === 'PUT') {
       // Tier list öğesini güncelle
       const { title, description, image } = req.body;
       
-      const { rows } = await sql`
-        UPDATE tier_list 
-        SET title = ${title}, 
-            description = ${description || ''}, 
-            image = ${image || null},
-            updated_at = NOW()
-        WHERE id = ${id}
-        RETURNING *
-      `;
+      const updateData = {
+        title,
+        description: description || '',
+        image: image || null,
+        updated_at: new Date()
+      };
       
-      if (rows.length === 0) {
+      const result = await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      
+      if (!result.value) {
         return res.status(404).json({ error: 'Tier list item not found' });
       }
       
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...result.value, id: result.value._id });
     }
 
     if (req.method === 'DELETE') {
       // Tier list öğesini sil
-      const { rows } = await sql`DELETE FROM tier_list WHERE id = ${id} RETURNING *`;
-      if (rows.length === 0) {
+      const result = await collection.findOneAndDelete({ _id: objectId });
+      if (!result.value) {
         return res.status(404).json({ error: 'Tier list item not found' });
       }
       return res.status(200).json({ message: 'Tier list item deleted successfully' });
@@ -57,6 +75,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  } finally {
+    await client.close();
   }
 }
-

@@ -1,4 +1,7 @@
-import { sql } from '@vercel/postgres';
+import { MongoClient, ObjectId } from 'mongodb';
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
   // CORS headers
@@ -14,40 +17,55 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   try {
+    await client.connect();
+    const db = client.db('archub');
+    const collection = db.collection('external_resources');
+
+    // MongoDB ObjectId'ye çevir
+    let objectId;
+    try {
+      objectId = new ObjectId(id);
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid ID format' });
+    }
+
     if (req.method === 'GET') {
       // Tek bir dış kaynağı getir
-      const { rows } = await sql`SELECT * FROM external_resources WHERE id = ${id}`;
-      if (rows.length === 0) {
+      const resource = await collection.findOne({ _id: objectId });
+      if (!resource) {
         return res.status(404).json({ error: 'External resource not found' });
       }
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...resource, id: resource._id });
     }
 
     if (req.method === 'PUT') {
       // Dış kaynağı güncelle
       const { title, description, url } = req.body;
       
-      const { rows } = await sql`
-        UPDATE external_resources 
-        SET title = ${title}, 
-            description = ${description || ''}, 
-            url = ${url || ''},
-            updated_at = NOW()
-        WHERE id = ${id}
-        RETURNING *
-      `;
+      const updateData = {
+        title,
+        description: description || '',
+        url: url || '',
+        updated_at: new Date()
+      };
       
-      if (rows.length === 0) {
+      const result = await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      
+      if (!result.value) {
         return res.status(404).json({ error: 'External resource not found' });
       }
       
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...result.value, id: result.value._id });
     }
 
     if (req.method === 'DELETE') {
       // Dış kaynağı sil
-      const { rows } = await sql`DELETE FROM external_resources WHERE id = ${id} RETURNING *`;
-      if (rows.length === 0) {
+      const result = await collection.findOneAndDelete({ _id: objectId });
+      if (!result.value) {
         return res.status(404).json({ error: 'External resource not found' });
       }
       return res.status(200).json({ message: 'External resource deleted successfully' });
@@ -57,6 +75,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  } finally {
+    await client.close();
   }
 }
-

@@ -1,4 +1,7 @@
-import { sql } from '@vercel/postgres';
+import { MongoClient, ObjectId } from 'mongodb';
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
   // CORS headers
@@ -14,42 +17,57 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   try {
+    await client.connect();
+    const db = client.db('archub');
+    const collection = db.collection('regions');
+
+    // MongoDB ObjectId'ye çevir
+    let objectId;
+    try {
+      objectId = new ObjectId(id);
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid ID format' });
+    }
+
     if (req.method === 'GET') {
       // Tek bir bölgeyi getir
-      const { rows } = await sql`SELECT * FROM regions WHERE id = ${id}`;
-      if (rows.length === 0) {
+      const region = await collection.findOne({ _id: objectId });
+      if (!region) {
         return res.status(404).json({ error: 'Region not found' });
       }
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...region, id: region._id });
     }
 
     if (req.method === 'PUT') {
       // Bölgeyi güncelle
       const { name, category, map, description, image } = req.body;
       
-      const { rows } = await sql`
-        UPDATE regions 
-        SET name = ${name}, 
-            category = ${category}, 
-            map = ${map}, 
-            description = ${description || ''}, 
-            image = ${image || null},
-            updated_at = NOW()
-        WHERE id = ${id}
-        RETURNING *
-      `;
+      const updateData = {
+        name,
+        category,
+        map,
+        description: description || '',
+        image: image || null,
+        updated_at: new Date()
+      };
       
-      if (rows.length === 0) {
+      const result = await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      
+      if (!result.value) {
         return res.status(404).json({ error: 'Region not found' });
       }
       
-      return res.status(200).json(rows[0]);
+      return res.status(200).json({ ...result.value, id: result.value._id });
     }
 
     if (req.method === 'DELETE') {
       // Bölgeyi sil
-      const { rows } = await sql`DELETE FROM regions WHERE id = ${id} RETURNING *`;
-      if (rows.length === 0) {
+      const result = await collection.findOneAndDelete({ _id: objectId });
+      if (!result.value) {
         return res.status(404).json({ error: 'Region not found' });
       }
       return res.status(200).json({ message: 'Region deleted successfully' });
@@ -59,6 +77,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  } finally {
+    await client.close();
   }
 }
-

@@ -1,4 +1,7 @@
-import { sql } from '@vercel/postgres';
+import { MongoClient } from 'mongodb';
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
   // CORS headers
@@ -12,29 +15,41 @@ export default async function handler(req, res) {
   }
 
   try {
+    await client.connect();
+    const db = client.db('archub');
+    const collection = db.collection('regions');
+
     if (req.method === 'GET') {
       // Tüm bölgeleri getir
-      const { rows } = await sql`SELECT * FROM regions ORDER BY created_at DESC`;
-      return res.status(200).json(rows);
+      const regions = await collection.find({}).sort({ created_at: -1 }).toArray();
+      return res.status(200).json(regions);
     }
 
     if (req.method === 'POST') {
       // Yeni bölge ekle
       const { name, category, map, description, image } = req.body;
       
-      const { rows } = await sql`
-        INSERT INTO regions (name, category, map, description, image, created_at)
-        VALUES (${name}, ${category}, ${map}, ${description || ''}, ${image || null}, NOW())
-        RETURNING *
-      `;
+      const region = {
+        name,
+        category,
+        map,
+        description: description || '',
+        image: image || null,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
       
-      return res.status(201).json(rows[0]);
+      const result = await collection.insertOne(region);
+      const newRegion = { ...region, id: result.insertedId };
+      
+      return res.status(201).json(newRegion);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  } finally {
+    await client.close();
   }
 }
-
