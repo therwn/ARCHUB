@@ -1720,30 +1720,6 @@ void main(){
           </div>
         </div>
       `).join('');
-      
-      // Kartlara tıklama event'i ekle (silme butonu hariç)
-      listContainer.querySelectorAll('.loot-region-card[data-external-resource-id]').forEach(card => {
-        card.addEventListener('click', (e) => {
-          // Silme butonuna tıklanırsa linke gitme
-          if (e.target.classList.contains('card-delete-btn')) return;
-          
-          const url = card.getAttribute('data-external-resource-url');
-          if (url && url.trim() !== '') {
-            window.open(url, '_blank', 'noopener,noreferrer');
-          }
-        });
-      });
-      
-      // Silme butonlarına event listener ekle
-      listContainer.querySelectorAll('.card-delete-btn[data-external-resource-id]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const resourceId = parseInt(btn.getAttribute('data-external-resource-id'));
-          if (confirm('Bu dış kaynağı silmek istediğinize emin misiniz?')) {
-            this.deleteExternalResource(resourceId);
-          }
-        });
-      });
     },
     
     openExternalResourcesAddModal() {
