@@ -175,6 +175,7 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
     performanceMonitor: { frameCount: 0, lastTime: 0, fps: 60 },
     pane: null,
     isBackgroundPlaying: false,
+    isMusicMuted: false,
     paneVisible: false,
     paneInitialized: false,
     isSceneReady: false,
@@ -209,6 +210,7 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
       this.setupModalHandlers();
       this.setupNavClickHandlers();
       this.setupCrosshair();
+      this.setupAudioWave();
       if (!this.webglSupported) {
         this.showFallback();
         return;
@@ -263,6 +265,58 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
         crosshair.classList.remove("visible");
         isAnimating = false;
       });
+    },
+    
+    setupAudioWave() {
+      const audioWaveContainer = document.getElementById("audioWaveContainer");
+      const audioWave = document.getElementById("audioWave");
+      
+      if (!audioWaveContainer || !audioWave) return;
+      
+      // Click event listener
+      audioWaveContainer.addEventListener("click", () => {
+        this.toggleMusic();
+      });
+      
+      // İlk durumu ayarla (müzik çalmıyorsa paused)
+      if (!this.isBackgroundPlaying) {
+        audioWave.classList.add("paused");
+        audioWave.classList.remove("playing");
+      }
+    },
+    
+    updateAudioWave(isPlaying) {
+      const audioWave = document.getElementById("audioWave");
+      if (!audioWave) return;
+      
+      if (isPlaying && !this.isMusicMuted) {
+        audioWave.classList.remove("paused");
+        audioWave.classList.add("playing");
+      } else {
+        audioWave.classList.remove("playing");
+        audioWave.classList.add("paused");
+      }
+    },
+    
+    toggleMusic() {
+      if (!this.backgroundMusic) return;
+      
+      if (this.isMusicMuted) {
+        // Müziği aç
+        this.backgroundMusic.volume = 0.3;
+        if (this.isBackgroundPlaying) {
+          this.backgroundMusic.play().catch((err) => {
+            console.warn("Error playing music:", err);
+          });
+        }
+        this.isMusicMuted = false;
+        this.updateAudioWave(true);
+      } else {
+        // Müziği kapat
+        this.backgroundMusic.volume = 0;
+        this.isMusicMuted = true;
+        this.updateAudioWave(false);
+      }
     },
     
     initNoiseCanvas() {
