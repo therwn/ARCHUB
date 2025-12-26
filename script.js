@@ -209,7 +209,6 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
       this.loadExternalResourcesFromStorage(); // Kaydedilmiş dış kaynakları yükle
       this.setupModalHandlers();
       this.setupNavClickHandlers();
-      this.setupCrosshair();
       this.setupAudioWave();
       if (!this.webglSupported) {
         this.showFallback();
@@ -218,54 +217,6 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
       this.waitForDependencies();
     },
     
-    setupCrosshair() {
-      const crosshair = document.getElementById("crosshair");
-      if (!crosshair) return;
-      
-      let mouseX = 0;
-      let mouseY = 0;
-      let crosshairX = 0;
-      let crosshairY = 0;
-      let isAnimating = false;
-      
-      const updateCrosshair = () => {
-        if (!isAnimating) return;
-        
-        // Smooth follow
-        crosshairX += (mouseX - crosshairX) * 0.1;
-        crosshairY += (mouseY - crosshairY) * 0.1;
-        
-        crosshair.style.left = crosshairX + "px";
-        crosshair.style.top = crosshairY + "px";
-        
-        requestAnimationFrame(updateCrosshair);
-      };
-      
-      document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!crosshair.classList.contains("visible")) {
-          crosshair.classList.add("visible");
-        }
-        if (!isAnimating) {
-          isAnimating = true;
-          updateCrosshair();
-        }
-      });
-      
-      document.addEventListener("mouseenter", () => {
-        crosshair.classList.add("visible");
-        if (!isAnimating) {
-          isAnimating = true;
-          updateCrosshair();
-        }
-      });
-      
-      document.addEventListener("mouseleave", () => {
-        crosshair.classList.remove("visible");
-        isAnimating = false;
-      });
-    },
     
     setupAudioWave() {
       const audioWaveContainer = document.getElementById("audioWaveContainer");

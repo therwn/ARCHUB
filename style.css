@@ -41,11 +41,9 @@ body {
   letter-spacing: -0.03em;
   position: relative;
   overflow: hidden;
-  cursor: none;
 }
 
 * {
-  cursor: none !important;
 }
 
 body.loading-active {
@@ -1222,55 +1220,6 @@ body.loading-active {
   box-shadow: 0 6px 16px rgba(0, 255, 243, 0.15);
 }
 
-/* Custom Crosshair */
-.crosshair {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  pointer-events: none;
-  z-index: 20000; /* Lightbox'tan daha yüksek (lightbox: 10000) */
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.crosshair.visible {
-  opacity: 1;
-}
-
-.crosshair-line {
-  position: absolute;
-  background: var(--color--foreground);
-}
-
-.crosshair-line-h {
-  width: 20px;
-  height: 1px;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-}
-
-.crosshair-line-v {
-  width: 1px;
-  height: 20px;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-}
-
-.crosshair-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 2px;
-  height: 2px;
-  background: var(--color--foreground);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
 
 .dg.ac {
   z-index: 3000 !important;
