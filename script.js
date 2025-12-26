@@ -1098,43 +1098,27 @@ void main(){
           const isEditMode = form.dataset.editMode === "true";
           const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          if (isEditMode && editId) {
-            // Mevcut bölgeyi güncelle
-            const regionIndex = this.regions.findIndex(r => r.id === editId);
-            if (regionIndex !== -1) {
-              this.regions[regionIndex] = {
-                ...this.regions[regionIndex],
-                name: data.regionName,
-                category: data.regionCategory,
-                map: data.regionMap,
-                description: data.regionDescription || "",
-                image: imageBase64 || this.regions[regionIndex].image, // Yeni görsel yoksa eskisini koru
-                updatedAt: new Date().toISOString()
-              };
-            }
-          } else {
-            // Yeni bölge ekle
-            const region = {
-              id: Date.now(), // Basit ID
-              name: data.regionName,
-              category: data.regionCategory,
-              map: data.regionMap,
-              description: data.regionDescription || "",
-              image: imageBase64,
-              createdAt: new Date().toISOString()
-            };
-            
-            this.regions.push(region);
-          }
+          const regionData = {
+            name: data.regionName,
+            category: data.regionCategory,
+            map: data.regionMap,
+            description: data.regionDescription || "",
+            image: imageBase64
+          };
           
           // Edit mode flag'lerini temizle
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
-          console.log("Bölge eklendi:", region);
-          console.log("Toplam bölge sayısı:", this.regions.length);
           
-          // LocalStorage'a kaydet (opsiyonel)
-          this.saveRegionsToStorage();
+          if (isEditMode && editId) {
+            // Mevcut bölgeyi güncelle
+            await this.updateRegion(editId, regionData);
+          } else {
+            // Yeni bölge ekle
+            await this.createRegion(regionData);
+          }
           
           this.closeModal();
         });
@@ -1532,37 +1516,27 @@ void main(){
           const isEditMode = form.dataset.editMode === "true";
           const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          if (isEditMode && editId) {
-            // Mevcut item'ı güncelle
-            const itemIndex = this.tierListItems.findIndex(i => i.id === editId);
-            if (itemIndex !== -1) {
-              this.tierListItems[itemIndex] = {
-                ...this.tierListItems[itemIndex],
-                title: data.tierListTitle,
-                description: data.tierListDescription || "",
-                image: imageBase64 || this.tierListItems[itemIndex].image, // Yeni görsel yoksa eskisini koru
-                updatedAt: new Date().toISOString()
-              };
-            }
-          } else {
-            // Yeni item ekle
-            const item = {
-              id: Date.now(),
-              title: data.tierListTitle,
-              description: data.tierListDescription || "",
-              image: imageBase64,
-              createdAt: new Date().toISOString()
-            };
-            
-            this.tierListItems.push(item);
-          }
+          const itemData = {
+            title: data.tierListTitle,
+            description: data.tierListDescription || "",
+            image: imageBase64
+          };
           
           // Edit mode flag'lerini temizle
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
-          this.saveTierListToStorage();
+          
+          if (isEditMode && editId) {
+            // Mevcut item'ı güncelle
+            await this.updateTierListItem(editId, itemData);
+          } else {
+            // Yeni item ekle
+            await this.createTierListItem(itemData);
+          }
+          
           this.closeTierListAddModal();
-          this.renderTierListItems();
         });
       }
 
@@ -1751,10 +1725,8 @@ void main(){
     },
     
     deleteRegion(regionId) {
-      this.showConfirmModal("Bu bölgeyi silmek istediğinize emin misiniz?", () => {
-        this.regions = this.regions.filter(r => r.id !== regionId);
-        this.saveRegionsToStorage();
-        this.renderRegions();
+      this.showConfirmModal("Bu bölgeyi silmek istediğinize emin misiniz?", async () => {
+        await this.deleteRegionFromAPI(regionId);
       });
     },
     
@@ -1788,10 +1760,8 @@ void main(){
     },
     
     deleteTierListItem(itemId) {
-      this.showConfirmModal("Bu tier list öğesini silmek istediğinize emin misiniz?", () => {
-        this.tierListItems = this.tierListItems.filter(item => item.id !== itemId);
-        this.saveTierListToStorage();
-        this.renderTierListItems();
+      this.showConfirmModal("Bu tier list öğesini silmek istediğinize emin misiniz?", async () => {
+        await this.deleteTierListItemFromAPI(itemId);
       });
     },
     
@@ -1820,10 +1790,8 @@ void main(){
     },
     
     deleteExternalResource(resourceId) {
-      this.showConfirmModal("Bu dış kaynağı silmek istediğinize emin misiniz?", () => {
-        this.externalResources = this.externalResources.filter(r => r.id !== resourceId);
-        this.saveExternalResourcesToStorage();
-        this.renderExternalResources();
+      this.showConfirmModal("Bu dış kaynağı silmek istediğinize emin misiniz?", async () => {
+        await this.deleteExternalResourceFromAPI(resourceId);
       });
     },
     
@@ -2177,40 +2145,27 @@ void main(){
           const isEditMode = form.dataset.editMode === "true";
           const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          if (isEditMode && editId) {
-            // Mevcut kaynağı güncelle
-            const resourceIndex = this.externalResources.findIndex(r => r.id === editId);
-            if (resourceIndex !== -1) {
-              this.externalResources[resourceIndex] = {
-                ...this.externalResources[resourceIndex],
-                title: data.externalResourceTitle,
-                description: data.externalResourceDescription || "",
-                url: data.externalResourceUrl || "",
-                updatedAt: new Date().toISOString()
-              };
-            }
-          } else {
-            // Yeni kaynak ekle
-            // Unique ID oluştur (Date.now() + random number)
-            const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-            
-            const item = {
-              id: uniqueId,
-              title: data.externalResourceTitle,
-              description: data.externalResourceDescription || "",
-              url: data.externalResourceUrl || "",
-              createdAt: new Date().toISOString()
-            };
-            
-            this.externalResources.push(item);
-          }
+          const resourceData = {
+            title: data.externalResourceTitle,
+            description: data.externalResourceDescription || "",
+            url: data.externalResourceUrl || ""
+          };
           
           // Edit mode flag'lerini temizle
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
-          this.saveExternalResourcesToStorage();
+          
+          if (isEditMode && editId) {
+            // Mevcut kaynağı güncelle
+            await this.updateExternalResource(editId, resourceData);
+          } else {
+            // Yeni kaynak ekle
+            await this.createExternalResource(resourceData);
+          }
+          
           this.closeExternalResourcesAddModal();
-          this.renderExternalResources();
           
           // Form'u resetle ve button'u tekrar aktif et
           form.reset();
@@ -2227,50 +2182,205 @@ void main(){
       }
     },
     
-    saveTierListToStorage() {
+    async fetchTierListItems() {
       try {
-        localStorage.setItem("archub_tierlist", JSON.stringify(this.tierListItems));
-      } catch (e) {
-        console.warn("LocalStorage'a kayıt yapılamadı:", e);
+        const response = await fetch('/api/tier-list');
+        if (!response.ok) throw new Error('Failed to fetch tier list');
+        this.tierListItems = await response.json();
+        this.renderTierListItems();
+      } catch (error) {
+        console.error('Error fetching tier list:', error);
+        // Fallback to localStorage
+        try {
+          const stored = localStorage.getItem("archub_tierlist");
+          if (stored) {
+            this.tierListItems = JSON.parse(stored);
+            this.renderTierListItems();
+          }
+        } catch (e) {
+          console.warn("LocalStorage'dan yükleme yapılamadı:", e);
+        }
       }
+    },
+    
+    async createTierListItem(itemData) {
+      try {
+        const response = await fetch('/api/tier-list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemData)
+        });
+        if (!response.ok) throw new Error('Failed to create tier list item');
+        const newItem = await response.json();
+        this.tierListItems.push(newItem);
+        this.renderTierListItems();
+        return newItem;
+      } catch (error) {
+        console.error('Error creating tier list item:', error);
+        // Fallback to localStorage
+        itemData.id = Date.now();
+        itemData.createdAt = new Date().toISOString();
+        this.tierListItems.push(itemData);
+        localStorage.setItem("archub_tierlist", JSON.stringify(this.tierListItems));
+        this.renderTierListItems();
+        return itemData;
+      }
+    },
+    
+    async updateTierListItem(id, itemData) {
+      try {
+        const response = await fetch(`/api/tier-list/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemData)
+        });
+        if (!response.ok) throw new Error('Failed to update tier list item');
+        const updatedItem = await response.json();
+        const index = this.tierListItems.findIndex(i => i.id === id);
+        if (index !== -1) {
+          this.tierListItems[index] = updatedItem;
+        }
+        this.renderTierListItems();
+        return updatedItem;
+      } catch (error) {
+        console.error('Error updating tier list item:', error);
+        // Fallback to localStorage
+        const index = this.tierListItems.findIndex(i => i.id === id);
+        if (index !== -1) {
+          this.tierListItems[index] = { ...this.tierListItems[index], ...itemData };
+          localStorage.setItem("archub_tierlist", JSON.stringify(this.tierListItems));
+          this.renderTierListItems();
+        }
+      }
+    },
+    
+    async deleteTierListItemFromAPI(id) {
+      try {
+        const response = await fetch(`/api/tier-list/${id}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete tier list item');
+        this.tierListItems = this.tierListItems.filter(item => item.id !== id);
+        this.renderTierListItems();
+      } catch (error) {
+        console.error('Error deleting tier list item:', error);
+        // Fallback to localStorage
+        this.tierListItems = this.tierListItems.filter(item => item.id !== id);
+        localStorage.setItem("archub_tierlist", JSON.stringify(this.tierListItems));
+        this.renderTierListItems();
+      }
+    },
+    
+    // Legacy functions
+    saveTierListToStorage() {
+      // No-op, data is now in database
     },
     
     loadTierListFromStorage() {
+      // Load from API instead
+      this.fetchTierListItems();
+    },
+    
+    async fetchExternalResources() {
       try {
-        const stored = localStorage.getItem("archub_tierlist");
-        if (stored) {
-          this.tierListItems = JSON.parse(stored);
+        const response = await fetch('/api/external-resources');
+        if (!response.ok) throw new Error('Failed to fetch external resources');
+        this.externalResources = await response.json();
+        this.renderExternalResources();
+      } catch (error) {
+        console.error('Error fetching external resources:', error);
+        // Fallback to localStorage
+        try {
+          const stored = localStorage.getItem("archub_external_resources");
+          if (stored) {
+            const loaded = JSON.parse(stored);
+            this.externalResources = loaded.filter((item, index, self) => 
+              index === self.findIndex(t => t.id === item.id)
+            );
+            this.renderExternalResources();
+          }
+        } catch (e) {
+          console.warn("LocalStorage'dan yükleme yapılamadı:", e);
         }
-      } catch (e) {
-        console.warn("LocalStorage'dan yükleme yapılamadı:", e);
       }
     },
     
-    saveExternalResourcesToStorage() {
+    async createExternalResource(resourceData) {
       try {
+        const response = await fetch('/api/external-resources', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(resourceData)
+        });
+        if (!response.ok) throw new Error('Failed to create external resource');
+        const newResource = await response.json();
+        this.externalResources.push(newResource);
+        this.renderExternalResources();
+        return newResource;
+      } catch (error) {
+        console.error('Error creating external resource:', error);
+        // Fallback to localStorage
+        resourceData.id = Date.now() + Math.floor(Math.random() * 1000);
+        resourceData.createdAt = new Date().toISOString();
+        this.externalResources.push(resourceData);
         localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
-      } catch (e) {
-        console.warn("LocalStorage'a kayıt yapılamadı:", e);
+        this.renderExternalResources();
+        return resourceData;
       }
+    },
+    
+    async updateExternalResource(id, resourceData) {
+      try {
+        const response = await fetch(`/api/external-resources/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(resourceData)
+        });
+        if (!response.ok) throw new Error('Failed to update external resource');
+        const updatedResource = await response.json();
+        const index = this.externalResources.findIndex(r => r.id === id);
+        if (index !== -1) {
+          this.externalResources[index] = updatedResource;
+        }
+        this.renderExternalResources();
+        return updatedResource;
+      } catch (error) {
+        console.error('Error updating external resource:', error);
+        // Fallback to localStorage
+        const index = this.externalResources.findIndex(r => r.id === id);
+        if (index !== -1) {
+          this.externalResources[index] = { ...this.externalResources[index], ...resourceData };
+          localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
+          this.renderExternalResources();
+        }
+      }
+    },
+    
+    async deleteExternalResourceFromAPI(id) {
+      try {
+        const response = await fetch(`/api/external-resources/${id}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete external resource');
+        this.externalResources = this.externalResources.filter(r => r.id !== id);
+        this.renderExternalResources();
+      } catch (error) {
+        console.error('Error deleting external resource:', error);
+        // Fallback to localStorage
+        this.externalResources = this.externalResources.filter(r => r.id !== id);
+        localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
+        this.renderExternalResources();
+      }
+    },
+    
+    // Legacy functions
+    saveExternalResourcesToStorage() {
+      // No-op, data is now in database
     },
     
     loadExternalResourcesFromStorage() {
-      try {
-        const stored = localStorage.getItem("archub_external_resources");
-        if (stored) {
-          const loaded = JSON.parse(stored);
-          // Duplicate'leri temizle - aynı ID'ye sahip itemların sadece birini tut
-          this.externalResources = loaded.filter((item, index, self) => 
-            index === self.findIndex(t => t.id === item.id)
-          );
-          // Eğer temizleme yapıldıysa tekrar kaydet
-          if (loaded.length !== this.externalResources.length) {
-            this.saveExternalResourcesToStorage();
-          }
-        }
-      } catch (e) {
-        console.warn("LocalStorage'dan yükleme yapılamadı:", e);
-      }
+      // Load from API instead
+      this.fetchExternalResources();
     },
     
     saveRegionsToStorage() {
