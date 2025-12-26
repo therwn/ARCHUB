@@ -1842,7 +1842,7 @@ void main(){
           // Silme butonuna tıklanırsa
           if (e.target.classList.contains('card-delete-btn') || e.target.closest('.card-delete-btn')) {
             e.stopPropagation();
-            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id'));
+            const resourceId = e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id');
             if (resourceId) {
               this.deleteExternalResource(resourceId);
             }
@@ -2327,16 +2327,30 @@ void main(){
       try {
         // ID'yi string'e çevir (MongoDB ObjectId için)
         const idStr = id?.toString() || id;
+        
+        // Eğer ID sayısal ise (eski LocalStorage verisi), MongoDB'de bulunamaz
+        // Bu durumda sadece LocalStorage'dan sil
+        if (!isNaN(idStr) && idStr.length < 24) {
+          console.warn('Numeric ID detected, removing from LocalStorage only:', idStr);
+          this.externalResources = this.externalResources.filter(r => (r.id?.toString() || r.id) !== idStr && r._id?.toString() !== idStr);
+          localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
+          this.renderExternalResources();
+          return;
+        }
+        
         const response = await fetch(`/api/external-resources/${idStr}`, {
           method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Failed to delete external resource');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to delete external resource: ${response.status} ${errorText}`);
+        }
         this.externalResources = this.externalResources.filter(r => (r.id?.toString() || r.id) !== idStr && r._id?.toString() !== idStr);
         this.renderExternalResources();
       } catch (error) {
         console.error('Error deleting external resource:', error);
         // Fallback to localStorage
-        this.externalResources = this.externalResources.filter(r => r.id !== id && r.id?.toString() !== id?.toString());
+        this.externalResources = this.externalResources.filter(r => (r.id?.toString() || r.id) !== idStr && r._id?.toString() !== idStr);
         localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
         this.renderExternalResources();
       }
