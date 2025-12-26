@@ -1067,10 +1067,23 @@ void main(){
 
       const form = document.getElementById("newRegionForm");
       if (form) {
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const formData = new FormData(form);
           const data = Object.fromEntries(formData.entries());
+          
+          // Görseli base64'e çevir
+          let imageBase64 = null;
+          const fileInput = document.getElementById("regionImage");
+          if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            imageBase64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          }
           
           // Bölgeyi kaydet
           const region = {
@@ -1079,7 +1092,7 @@ void main(){
             category: data.regionCategory,
             map: data.regionMap,
             description: data.regionDescription || "",
-            image: data.regionImage ? data.regionImage.name : null,
+            image: imageBase64,
             createdAt: new Date().toISOString()
           };
           
