@@ -2145,18 +2145,41 @@ void main(){
           const formData = new FormData(form);
           const data = Object.fromEntries(formData.entries());
           
-          // Unique ID oluştur (Date.now() + random number)
-          const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+          // Düzenleme modunda mı kontrol et
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          const item = {
-            id: uniqueId,
-            title: data.externalResourceTitle,
-            description: data.externalResourceDescription || "",
-            url: data.externalResourceUrl || "",
-            createdAt: new Date().toISOString()
-          };
+          if (isEditMode && editId) {
+            // Mevcut kaynağı güncelle
+            const resourceIndex = this.externalResources.findIndex(r => r.id === editId);
+            if (resourceIndex !== -1) {
+              this.externalResources[resourceIndex] = {
+                ...this.externalResources[resourceIndex],
+                title: data.externalResourceTitle,
+                description: data.externalResourceDescription || "",
+                url: data.externalResourceUrl || "",
+                updatedAt: new Date().toISOString()
+              };
+            }
+          } else {
+            // Yeni kaynak ekle
+            // Unique ID oluştur (Date.now() + random number)
+            const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+            
+            const item = {
+              id: uniqueId,
+              title: data.externalResourceTitle,
+              description: data.externalResourceDescription || "",
+              url: data.externalResourceUrl || "",
+              createdAt: new Date().toISOString()
+            };
+            
+            this.externalResources.push(item);
+          }
           
-          this.externalResources.push(item);
+          // Edit mode flag'lerini temizle
+          delete form.dataset.editMode;
+          delete form.dataset.editId;
           this.saveExternalResourcesToStorage();
           this.closeExternalResourcesAddModal();
           this.renderExternalResources();
