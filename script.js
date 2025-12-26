@@ -435,6 +435,10 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
 
     showFallback() {
       document.getElementById("fallbackBg").classList.add("active");
+      const fogOverlay = document.getElementById("fogOverlay");
+      if (fogOverlay) {
+        fogOverlay.classList.add("active");
+      }
       this.finishPreloader();
     },
 
