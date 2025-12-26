@@ -1201,15 +1201,20 @@ void main(){
               ${region.description}
             </div>
             ` : ''}
+            ${region.image ? `
+            <div class="region-card-image">
+              <img src="${region.image}" alt="${region.name}" class="zoomable-image" data-image-src="${region.image}" style="max-width: 100%; height: auto; margin-top: 0.5rem; cursor: zoom-in;">
+            </div>
+            ` : ''}
           </div>
         </div>
       `).join('');
       
-      // Kartlara tıklama event'i ekle (silme butonu hariç)
+      // Kartlara tıklama event'i ekle (silme butonu ve görsel hariç)
       listContainer.querySelectorAll('.loot-region-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Silme butonuna tıklanırsa detay açılmasın
-          if (e.target.classList.contains('card-delete-btn')) return;
+          // Silme butonuna veya görsele tıklanırsa detay açılmasın
+          if (e.target.classList.contains('card-delete-btn') || e.target.classList.contains('zoomable-image')) return;
           
           const regionId = parseInt(card.getAttribute('data-region-id'));
           const region = this.regions.find(r => r.id === regionId);
@@ -1227,6 +1232,15 @@ void main(){
           if (confirm('Bu bölgeyi silmek istediğinize emin misiniz?')) {
             this.deleteRegion(regionId);
           }
+        });
+      });
+      
+      // Görsellere zoom event listener ekle
+      listContainer.querySelectorAll('.zoomable-image').forEach(img => {
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const imageSrc = img.getAttribute('data-image-src') || img.src;
+          this.openImageLightbox(imageSrc);
         });
       });
     },
@@ -1538,6 +1552,21 @@ void main(){
         });
         modal.dataset.listenerAdded = "true";
       }
+      
+      // Detay modalındaki görsellere zoom ekle (her açılışta yeniden ekle çünkü içerik dinamik)
+      setTimeout(() => {
+        const detailImages = modal.querySelectorAll('.zoomable-image');
+        detailImages.forEach(img => {
+          // Eğer zaten listener eklenmişse tekrar ekleme
+          if (img.dataset.zoomListenerAdded) return;
+          img.dataset.zoomListenerAdded = 'true';
+          img.style.cursor = 'zoom-in';
+          img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openImageLightbox(img.src);
+          });
+        });
+      }, 100);
     },
     
     deleteRegion(regionId) {
@@ -1747,7 +1776,7 @@ void main(){
             <div class="detail-row detail-image">
               <span class="detail-label">Görsel:</span>
               <div class="detail-image-container">
-                <p class="detail-value">${region.image}</p>
+                <img src="${region.image}" alt="${region.name}" class="detail-image zoomable-image" style="cursor: zoom-in; max-width: 100%; height: auto;">
               </div>
             </div>
             ` : ''}
@@ -1789,6 +1818,16 @@ void main(){
           }
         });
       }
+      
+      // Detay modalındaki görsellere zoom ekle
+      const detailImages = modal.querySelectorAll('.zoomable-image');
+      detailImages.forEach(img => {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.openImageLightbox(img.src);
+        });
+      });
     },
     
     closeExternalResourcesAddModal() {
