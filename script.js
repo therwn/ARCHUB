@@ -525,10 +525,12 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
       console.log("Music ended, playing next track...");
       // Bir sonraki şarkıyı seç ve çal
       this.selectRandomMusic();
-      if (this.backgroundMusic && this.isBackgroundPlaying) {
+      if (this.backgroundMusic && this.isBackgroundPlaying && !this.isMusicMuted) {
+        this.backgroundMusic.volume = 0.3;
         this.backgroundMusic.play().catch((err) => {
           console.warn("Error playing next music:", err);
         });
+        this.updateAudioWave(true);
       }
     },
 
