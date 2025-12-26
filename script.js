@@ -1700,7 +1700,7 @@ void main(){
       }
 
       listContainer.innerHTML = this.externalResources.map(item => `
-        <div class="loot-region-card" data-external-resource-id="${item.id}">
+        <div class="loot-region-card" data-external-resource-id="${item.id}" data-external-resource-url="${item.url || ''}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
             <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
@@ -1713,12 +1713,26 @@ void main(){
             ` : ''}
             ${item.url ? `
             <div class="region-card-url" style="margin-top: 0.5rem;">
-              <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: rgba(0, 255, 243, 0.8); text-decoration: none; font-size: 0.75rem;">${item.url}</a>
+              <span style="color: rgba(196, 213, 188, 0.6); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Link:</span>
+              <span style="color: rgba(0, 255, 243, 0.8); font-size: 0.75rem; margin-left: 0.5rem; word-break: break-all;">${item.url}</span>
             </div>
             ` : ''}
           </div>
         </div>
       `).join('');
+      
+      // Kartlara tıklama event'i ekle (silme butonu hariç)
+      listContainer.querySelectorAll('.loot-region-card[data-external-resource-id]').forEach(card => {
+        card.addEventListener('click', (e) => {
+          // Silme butonuna tıklanırsa linke gitme
+          if (e.target.classList.contains('card-delete-btn')) return;
+          
+          const url = card.getAttribute('data-external-resource-url');
+          if (url && url.trim() !== '') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }
+        });
+      });
       
       // Silme butonlarına event listener ekle
       listContainer.querySelectorAll('.card-delete-btn[data-external-resource-id]').forEach(btn => {
