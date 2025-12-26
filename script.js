@@ -1942,14 +1942,27 @@ void main(){
       });
 
       const form = document.getElementById("externalResourcesAddForm");
-      if (form) {
+      if (form && !form.hasAttribute('data-listener-added')) {
+        form.setAttribute('data-listener-added', 'true');
         form.addEventListener("submit", (e) => {
           e.preventDefault();
+          e.stopPropagation(); // Event'in yayılmasını durdur
+          
+          // Form'u disable et (double submit'i önle)
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'KAYDEDİLİYOR...';
+          }
+          
           const formData = new FormData(form);
           const data = Object.fromEntries(formData.entries());
           
+          // Unique ID oluştur (Date.now() + random number)
+          const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+          
           const item = {
-            id: Date.now(),
+            id: uniqueId,
             title: data.externalResourceTitle,
             description: data.externalResourceDescription || "",
             url: data.externalResourceUrl || "",
@@ -1960,6 +1973,13 @@ void main(){
           this.saveExternalResourcesToStorage();
           this.closeExternalResourcesAddModal();
           this.renderExternalResources();
+          
+          // Form'u resetle ve button'u tekrar aktif et
+          form.reset();
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'KAYDET';
+          }
         });
       }
 
