@@ -1013,6 +1013,11 @@ void main(){
     setupNavClickHandlers() {
       document.querySelectorAll(".nav-links a").forEach((link, index) => {
         link.addEventListener("click", (e) => {
+          // External link'ler için preventDefault yapma
+          if (link.classList.contains("external-link")) {
+            return; // Normal link davranışını koru
+          }
+          
           e.preventDefault();
           const menuText = link.textContent.trim();
           

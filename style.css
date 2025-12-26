@@ -276,6 +276,19 @@ body.loading-active {
   opacity: 1;
 }
 
+/* External link icon styling */
+.nav-links a.external-link svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.nav-links a.external-link:hover svg {
+  opacity: 1;
+}
+
 .footer {
   bottom: 120px;
   right: 50px;
