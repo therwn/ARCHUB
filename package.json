@@ -1,0 +1,14 @@
+{
+  "name": "archub",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.5.1",
+    "@vercel/blob": "^0.19.0"
+  },
+  "devDependencies": {}
+}
+
