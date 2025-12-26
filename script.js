@@ -1090,18 +1090,42 @@ void main(){
             });
           }
           
-          // Bölgeyi kaydet
-          const region = {
-            id: Date.now(), // Basit ID
-            name: data.regionName,
-            category: data.regionCategory,
-            map: data.regionMap,
-            description: data.regionDescription || "",
-            image: imageBase64,
-            createdAt: new Date().toISOString()
-          };
+          // Düzenleme modunda mı kontrol et
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          this.regions.push(region);
+          if (isEditMode && editId) {
+            // Mevcut bölgeyi güncelle
+            const regionIndex = this.regions.findIndex(r => r.id === editId);
+            if (regionIndex !== -1) {
+              this.regions[regionIndex] = {
+                ...this.regions[regionIndex],
+                name: data.regionName,
+                category: data.regionCategory,
+                map: data.regionMap,
+                description: data.regionDescription || "",
+                image: imageBase64 || this.regions[regionIndex].image, // Yeni görsel yoksa eskisini koru
+                updatedAt: new Date().toISOString()
+              };
+            }
+          } else {
+            // Yeni bölge ekle
+            const region = {
+              id: Date.now(), // Basit ID
+              name: data.regionName,
+              category: data.regionCategory,
+              map: data.regionMap,
+              description: data.regionDescription || "",
+              image: imageBase64,
+              createdAt: new Date().toISOString()
+            };
+            
+            this.regions.push(region);
+          }
+          
+          // Edit mode flag'lerini temizle
+          delete form.dataset.editMode;
+          delete form.dataset.editId;
           console.log("Bölge eklendi:", region);
           console.log("Toplam bölge sayısı:", this.regions.length);
           
@@ -1206,6 +1230,12 @@ void main(){
             <h3 class="region-card-title">${region.name}</h3>
             <div class="region-card-actions">
               <span class="region-card-badge">${region.category}</span>
+              <button class="card-edit-btn" data-region-id="${region.id}" title="Düzenle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
               <button class="card-delete-btn" data-region-id="${region.id}" title="Sil">×</button>
             </div>
           </div>
@@ -1228,17 +1258,30 @@ void main(){
         </div>
       `).join('');
       
-      // Kartlara tıklama event'i ekle (silme butonu ve görsel hariç)
+      // Kartlara tıklama event'i ekle (silme/düzenleme butonu ve görsel hariç)
       listContainer.querySelectorAll('.loot-region-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Silme butonuna veya görsele tıklanırsa detay açılmasın
-          if (e.target.classList.contains('card-delete-btn') || e.target.classList.contains('zoomable-image')) return;
+          // Silme/düzenleme butonuna veya görsele tıklanırsa detay açılmasın
+          if (e.target.classList.contains('card-delete-btn') || 
+              e.target.classList.contains('card-edit-btn') ||
+              e.target.closest('.card-edit-btn') ||
+              e.target.closest('.card-delete-btn') ||
+              e.target.classList.contains('zoomable-image')) return;
           
           const regionId = parseInt(card.getAttribute('data-region-id'));
           const region = this.regions.find(r => r.id === regionId);
           if (region) {
             this.openRegionDetailModal(region);
           }
+        });
+      });
+      
+      // Düzenleme butonlarına event listener ekle
+      listContainer.querySelectorAll('.card-edit-btn[data-region-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const regionId = parseInt(btn.getAttribute('data-region-id'));
+          this.editRegion(regionId);
         });
       });
       
@@ -1345,7 +1388,15 @@ void main(){
         <div class="loot-region-card" data-tier-list-id="${item.id}">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
-            <button class="card-delete-btn" data-tier-list-id="${item.id}" title="Sil">×</button>
+            <div class="region-card-actions">
+              <button class="card-edit-btn" data-tier-list-id="${item.id}" title="Düzenle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="card-delete-btn" data-tier-list-id="${item.id}" title="Sil">×</button>
+            </div>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1362,17 +1413,30 @@ void main(){
         </div>
       `).join('');
       
-      // TierList kartlarına click event listener ekle (silme butonu ve görsel hariç)
+      // TierList kartlarına click event listener ekle (silme/düzenleme butonu ve görsel hariç)
       listContainer.querySelectorAll('.loot-region-card[data-tier-list-id]').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Silme butonuna veya görsele tıklanırsa detay açılmasın
-          if (e.target.classList.contains('card-delete-btn') || e.target.classList.contains('zoomable-image')) return;
+          // Silme/düzenleme butonuna veya görsele tıklanırsa detay açılmasın
+          if (e.target.classList.contains('card-delete-btn') || 
+              e.target.classList.contains('card-edit-btn') ||
+              e.target.closest('.card-edit-btn') ||
+              e.target.closest('.card-delete-btn') ||
+              e.target.classList.contains('zoomable-image')) return;
           
           const tierListId = parseInt(card.getAttribute('data-tier-list-id'));
           const tierListItem = this.tierListItems.find(item => item.id === tierListId);
           if (tierListItem) {
             this.openTierListDetailModal(tierListItem);
           }
+        });
+      });
+      
+      // Düzenleme butonlarına event listener ekle
+      listContainer.querySelectorAll('.card-edit-btn[data-tier-list-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const tierListId = parseInt(btn.getAttribute('data-tier-list-id'));
+          this.editTierListItem(tierListId);
         });
       });
       
@@ -1405,7 +1469,12 @@ void main(){
         }
         modal.classList.add("active");
         const form = document.getElementById("tierListAddForm");
-        if (form) form.reset();
+        if (form) {
+          form.reset();
+          // Edit mode flag'lerini temizle
+          delete form.dataset.editMode;
+          delete form.dataset.editId;
+        }
         const fileNameDisplay = document.getElementById("tierListImageFileName");
         if (fileNameDisplay) fileNameDisplay.textContent = "Dosya seçilmedi";
         this.setupTierListAddModalHandlers();
@@ -1455,15 +1524,38 @@ void main(){
             });
           }
           
-          const item = {
-            id: Date.now(),
-            title: data.tierListTitle,
-            description: data.tierListDescription || "",
-            image: imageBase64,
-            createdAt: new Date().toISOString()
-          };
+          // Düzenleme modunda mı kontrol et
+          const isEditMode = form.dataset.editMode === "true";
+          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
           
-          this.tierListItems.push(item);
+          if (isEditMode && editId) {
+            // Mevcut item'ı güncelle
+            const itemIndex = this.tierListItems.findIndex(i => i.id === editId);
+            if (itemIndex !== -1) {
+              this.tierListItems[itemIndex] = {
+                ...this.tierListItems[itemIndex],
+                title: data.tierListTitle,
+                description: data.tierListDescription || "",
+                image: imageBase64 || this.tierListItems[itemIndex].image, // Yeni görsel yoksa eskisini koru
+                updatedAt: new Date().toISOString()
+              };
+            }
+          } else {
+            // Yeni item ekle
+            const item = {
+              id: Date.now(),
+              title: data.tierListTitle,
+              description: data.tierListDescription || "",
+              image: imageBase64,
+              createdAt: new Date().toISOString()
+            };
+            
+            this.tierListItems.push(item);
+          }
+          
+          // Edit mode flag'lerini temizle
+          delete form.dataset.editMode;
+          delete form.dataset.editId;
           this.saveTierListToStorage();
           this.closeTierListAddModal();
           this.renderTierListItems();
@@ -1623,12 +1715,72 @@ void main(){
       });
     },
     
+    editRegion(regionId) {
+      const region = this.regions.find(r => r.id === regionId);
+      if (!region) return;
+      
+      const modal = document.getElementById("newRegionModal");
+      if (!modal) return;
+      
+      modal.classList.add("active");
+      
+      // Form alanlarını doldur
+      document.getElementById("regionName").value = region.name || "";
+      document.getElementById("regionMap").value = region.map || "";
+      document.getElementById("regionCategory").value = region.category || "";
+      document.getElementById("regionDescription").value = region.description || "";
+      
+      // Görsel varsa göster
+      const fileNameDisplay = document.getElementById("imageFileName");
+      if (fileNameDisplay) {
+        fileNameDisplay.textContent = region.image ? "Mevcut görsel yüklü" : "Dosya seçilmedi.";
+      }
+      
+      // Form'a edit mode flag'i ekle
+      const form = document.getElementById("newRegionForm");
+      if (form) {
+        form.dataset.editMode = "true";
+        form.dataset.editId = regionId;
+      }
+      
+      this.setupNewRegionModalHandlers();
+    },
+    
     deleteRegion(regionId) {
       this.showConfirmModal("Bu bölgeyi silmek istediğinize emin misiniz?", () => {
         this.regions = this.regions.filter(r => r.id !== regionId);
         this.saveRegionsToStorage();
         this.renderRegions();
       });
+    },
+    
+    editTierListItem(itemId) {
+      const item = this.tierListItems.find(i => i.id === itemId);
+      if (!item) return;
+      
+      const modal = document.getElementById("tierListAddModal");
+      if (!modal) return;
+      
+      modal.classList.add("active");
+      
+      // Form alanlarını doldur
+      document.getElementById("tierListTitle").value = item.title || "";
+      document.getElementById("tierListDescription").value = item.description || "";
+      
+      // Görsel varsa göster
+      const fileNameDisplay = document.getElementById("tierListImageFileName");
+      if (fileNameDisplay) {
+        fileNameDisplay.textContent = item.image ? "Mevcut görsel yüklü" : "Dosya seçilmedi";
+      }
+      
+      // Form'a edit mode flag'i ekle
+      const form = document.getElementById("tierListAddForm");
+      if (form) {
+        form.dataset.editMode = "true";
+        form.dataset.editId = itemId;
+      }
+      
+      this.setupTierListAddModalHandlers();
     },
     
     deleteTierListItem(itemId) {
@@ -1745,10 +1897,22 @@ void main(){
           if (!card) return;
           
           // Silme butonuna tıklanırsa
-          if (e.target.classList.contains('card-delete-btn')) {
+          if (e.target.classList.contains('card-delete-btn') || e.target.closest('.card-delete-btn')) {
             e.stopPropagation();
-            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id'));
-            this.deleteExternalResource(resourceId);
+            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id'));
+            if (resourceId) {
+              this.deleteExternalResource(resourceId);
+            }
+            return;
+          }
+          
+          // Düzenleme butonuna tıklanırsa
+          if (e.target.classList.contains('card-edit-btn') || e.target.closest('.card-edit-btn')) {
+            e.stopPropagation();
+            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id'));
+            if (resourceId) {
+              this.editExternalResource(resourceId);
+            }
             return;
           }
           
@@ -1795,7 +1959,15 @@ void main(){
         <div class="loot-region-card" data-external-resource-id="${item.id}" data-external-resource-url="${item.url || ''}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
-            <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
+            <div class="region-card-actions">
+              <button class="card-edit-btn" data-external-resource-id="${item.id}" title="Düzenle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
+            </div>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1826,7 +1998,12 @@ void main(){
         }
         modal.classList.add("active");
         const form = document.getElementById("externalResourcesAddForm");
-        if (form) form.reset();
+        if (form) {
+          form.reset();
+          // Edit mode flag'lerini temizle
+          delete form.dataset.editMode;
+          delete form.dataset.editId;
+        }
         this.setupExternalResourcesAddModalHandlers();
       }
     },

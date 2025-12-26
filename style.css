@@ -874,6 +874,30 @@ body.loading-active {
   transform: scale(1.1);
 }
 
+.card-edit-btn {
+  background: rgba(0, 255, 243, 0.2);
+  border: 1px solid rgba(0, 255, 243, 0.4);
+  color: #00fff3;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.card-edit-btn:hover {
+  background: rgba(0, 255, 243, 0.4);
+  border-color: rgba(0, 255, 243, 0.6);
+  transform: scale(1.1);
+}
+
 .region-card-info {
   display: flex;
   flex-direction: column;
