@@ -1,7 +1,5 @@
-import { MongoClient, ObjectId } from 'mongodb';
-
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+import { ObjectId } from 'mongodb';
+import clientPromise from '../db.js';
 
 export default async function handler(req, res) {
   // CORS headers
@@ -17,7 +15,7 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db('archub');
     const collection = db.collection('external_resources');
 
@@ -75,7 +73,5 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
-  } finally {
-    await client.close();
   }
 }
