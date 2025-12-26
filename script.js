@@ -1694,7 +1694,7 @@ void main(){
     },
     
     editRegion(regionId) {
-      const region = this.regions.find(r => r.id === regionId);
+      const region = this.regions.find(r => (r.id?.toString() || r.id) === regionId || r._id?.toString() === regionId);
       if (!region) return;
       
       const modal = document.getElementById("newRegionModal");
