@@ -1096,7 +1096,7 @@ void main(){
           
           // Düzenleme modunda mı kontrol et
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           
           const regionData = {
             name: data.regionName,
@@ -1108,7 +1108,7 @@ void main(){
           
           // Edit mode flag'lerini temizle
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
@@ -1256,8 +1256,8 @@ void main(){
               e.target.closest('.card-delete-btn') ||
               e.target.classList.contains('zoomable-image')) return;
           
-          const regionId = parseInt(card.getAttribute('data-region-id'));
-          const region = this.regions.find(r => r.id === regionId);
+          const regionId = card.getAttribute('data-region-id');
+          const region = this.regions.find(r => (r.id?.toString() || r.id) === regionId || r._id?.toString() === regionId);
           if (region) {
             this.openRegionDetailModal(region);
           }
@@ -1268,7 +1268,7 @@ void main(){
       listContainer.querySelectorAll('.card-edit-btn[data-region-id]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const regionId = parseInt(btn.getAttribute('data-region-id'));
+          const regionId = btn.getAttribute('data-region-id');
           this.editRegion(regionId);
         });
       });
@@ -1277,7 +1277,7 @@ void main(){
       listContainer.querySelectorAll('.card-delete-btn[data-region-id]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const regionId = parseInt(btn.getAttribute('data-region-id'));
+          const regionId = btn.getAttribute('data-region-id');
           this.deleteRegion(regionId);
         });
       });
@@ -1423,7 +1423,7 @@ void main(){
       listContainer.querySelectorAll('.card-edit-btn[data-tier-list-id]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const tierListId = parseInt(btn.getAttribute('data-tier-list-id'));
+          const tierListId = btn.getAttribute('data-tier-list-id');
           this.editTierListItem(tierListId);
         });
       });
@@ -1432,7 +1432,7 @@ void main(){
       listContainer.querySelectorAll('.card-delete-btn[data-tier-list-id]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const tierListId = parseInt(btn.getAttribute('data-tier-list-id'));
+          const tierListId = btn.getAttribute('data-tier-list-id');
           this.deleteTierListItem(tierListId);
         });
       });
@@ -1514,7 +1514,7 @@ void main(){
           
           // Düzenleme modunda mı kontrol et
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           
           const itemData = {
             title: data.tierListTitle,
@@ -1524,7 +1524,7 @@ void main(){
           
           // Edit mode flag'lerini temizle
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
@@ -1731,7 +1731,7 @@ void main(){
     },
     
     editTierListItem(itemId) {
-      const item = this.tierListItems.find(i => i.id === itemId);
+      const item = this.tierListItems.find(i => (i.id?.toString() || i.id) === itemId || i._id?.toString() === itemId);
       if (!item) return;
       
       const modal = document.getElementById("tierListAddModal");
@@ -1766,7 +1766,7 @@ void main(){
     },
     
     editExternalResource(resourceId) {
-      const resource = this.externalResources.find(r => r.id === resourceId);
+      const resource = this.externalResources.find(r => (r.id?.toString() || r.id) === resourceId || r._id?.toString() === resourceId);
       if (!resource) return;
       
       const modal = document.getElementById("externalResourcesAddModal");
@@ -1905,7 +1905,7 @@ void main(){
           // Düzenleme butonuna tıklanırsa
           if (e.target.classList.contains('card-edit-btn') || e.target.closest('.card-edit-btn')) {
             e.stopPropagation();
-            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id'));
+            const resourceId = e.target.getAttribute('data-external-resource-id') || e.target.closest('[data-external-resource-id]')?.getAttribute('data-external-resource-id');
             if (resourceId) {
               this.editExternalResource(resourceId);
             }
@@ -2143,7 +2143,7 @@ void main(){
           
           // Düzenleme modunda mı kontrol et
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           
           const resourceData = {
             title: data.externalResourceTitle,
@@ -2153,7 +2153,7 @@ void main(){
           
           // Edit mode flag'lerini temizle
           const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId ? parseInt(form.dataset.editId) : null;
+          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
