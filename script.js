@@ -1096,7 +1096,6 @@ void main(){
           
           // Düzenleme modunda mı kontrol et
           const isEditMode = form.dataset.editMode === "true";
-          const isEditMode = form.dataset.editMode === "true";
           const editId = form.dataset.editId || null;
           
           const regionData = {
