@@ -1,0 +1,332 @@
+### Page state
+- Page URL: https://codepen.io/filipz/pen/vEOpMvo
+- Page Title: [threejs/gsap] ❍ Interactive Glass Lens Effect with Sound FX
+- Page Snapshot:
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "CodePen Home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]
+        - generic [ref=e8]: CodePen Home
+      - generic [ref=e10]:
+        - heading "[threejs/gsap] ❍ Interactive Glass Lens Effect with Sound FX" [level=1] [ref=e11]:
+          - generic [ref=e12]: "[threejs/gsap] ❍ Interactive Glass Lens Effect with Sound FX"
+        - generic [ref=e13]:
+          - link "Filip Zrnzevic" [ref=e14] [cursor=pointer]:
+            - /url: /filipz
+          - link "PRO" [ref=e15] [cursor=pointer]:
+            - /url: https://codepen.io/pro
+            - img [ref=e16]
+          - button "Follow" [ref=e19] [cursor=pointer]:
+            - img
+            - text: Follow
+      - button "Love" [ref=e20] [cursor=pointer]:
+        - img
+        - generic [ref=e21]: Love
+      - generic [ref=e23]:
+        - button "Settings" [ref=e24] [cursor=pointer]:
+          - img
+          - text: Settings
+        - button "Change View" [ref=e26] [cursor=pointer]:
+          - img
+      - link "Sign Up" [ref=e27] [cursor=pointer]:
+        - /url: /accounts/signup/user/free
+      - link "Log In" [ref=e28] [cursor=pointer]:
+        - /url: /login
+  - option "None" [selected]
+  - option "Haml"
+  - option "Markdown"
+  - option "Slim"
+  - option "Pug"
+  - generic [ref=e30]:
+    - generic [ref=e31]:
+      - generic "Double-click to expand." [ref=e32]:
+        - heading "HTML" [level=2]:
+          - img
+          - generic: HTML
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading [level=2] [ref=e36]
+            - generic:
+              - text: 0 unsaved changes
+              - generic:
+                - img
+          - generic [ref=e37]:
+            - button "Open HTML Settings" [ref=e38] [cursor=pointer]:
+              - img
+            - button "HTML Options" [ref=e39] [cursor=pointer]:
+              - generic [ref=e40]: HTML Options
+              - img
+        - generic [ref=e42]:
+          - textbox "HTML Code Editor" [active] [ref=e43]
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - generic [ref=e50]: "1"
+              - text: <div class="error-message" id="errorMessage"></div>
+            - generic [ref=e51]:
+              - generic [ref=e52]: "2"
+              - text: <div class="fallback-bg" id="fallbackBg"></div>
+            - generic [ref=e54]: "3"
+            - generic [ref=e55]:
+              - generic [ref=e56]: "4"
+              - generic [ref=e58] [cursor=pointer]: ▾
+              - text: <div class="audio-enable">
+            - generic [ref=e59]:
+              - generic [ref=e60]: "5"
+              - generic [ref=e62] [cursor=pointer]: ▾
+              - text: <p>ENTER EXPERIENCE<br />WITH AUDIO</p>
+            - generic [ref=e63]:
+              - generic [ref=e64]: "6"
+              - generic [ref=e66] [cursor=pointer]: ▾
+              - text: <button class="enable-button" id="enableBtn">START</button>
+            - generic [ref=e67]:
+              - generic [ref=e68]: "7"
+              - text: </div>
+            - generic [ref=e70]: "8"
+            - generic [ref=e71]:
+              - generic [ref=e72]: "9"
+              - generic [ref=e74] [cursor=pointer]: ▾
+              - text: <div class="preloader" id="preloader">
+            - generic [ref=e75]:
+              - generic [ref=e76]: "10"
+              - generic [ref=e78] [cursor=pointer]: ▾
+              - text: <span id="counter">[000]</span>
+            - generic [ref=e79]:
+              - generic [ref=e80]: "11"
+              - text: </div>
+            - generic [ref=e82]: "12"
+            - generic [ref=e83]:
+              - generic [ref=e84]: "13"
+              - text: <canvas id="canvas"></canvas>
+            - generic [ref=e86]: "14"
+            - generic [ref=e87]:
+              - generic [ref=e88]: "15"
+              - generic [ref=e90] [cursor=pointer]: ▾
+              - text: <p class="text-element description">THE ARCHIVE COLLECTS RECORDS OF ABANDONED WORLDS AND LOST TECHNOLOGIES, WAITING TO BE DISCOVERED.</p>
+            - generic [ref=e92]: "16"
+            - generic [ref=e93]:
+              - generic [ref=e94]: "17"
+              - generic [ref=e96] [cursor=pointer]: ▾
+              - text: <nav class="text-element nav-links">
+            - generic [ref=e97]:
+              - generic [ref=e98]: "18"
+              - generic [ref=e100] [cursor=pointer]: ▾
+              - text: <a href="#">_DATA VAULTS</a>
+            - generic [ref=e101]:
+              - generic [ref=e102]: "19"
+              - generic [ref=e104] [cursor=pointer]: ▾
+              - text: <a href="#">_DEEP SPACE</a>
+            - generic [ref=e105]:
+              - generic [ref=e106]: "20"
+              - generic [ref=e108] [cursor=pointer]: ▾
+              - text: <a href="#">_FORBIDDEN ZONES</a>
+            - generic [ref=e109]:
+              - generic [ref=e110]: "21"
+              - generic [ref=e112] [cursor=pointer]: ▾
+              - text: <a href="#">_EXODUS LOGS</a>
+            - generic [ref=e113]:
+              - generic [ref=e114]: "22"
+              - text: </nav>
+      - generic "Double-click to expand." [ref=e119]:
+        - heading "CSS" [level=2]:
+          - img
+          - generic: CSS
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - heading [level=2] [ref=e123]
+          - generic [ref=e124]:
+            - button "Open CSS Settings" [ref=e125] [cursor=pointer]:
+              - img
+            - button "CSS Options" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: CSS Options
+              - img
+        - generic [ref=e129]:
+          - textbox "CSS Code Editor" [ref=e130]
+          - generic [ref=e135]:
+            - generic [ref=e136]:
+              - generic [ref=e137]: "1"
+              - generic [ref=e139] [cursor=pointer]: ▾
+              - text: "@font-face {"
+            - generic [ref=e140]:
+              - generic [ref=e141]: "2"
+              - text: "font-family: \"PPSupplyMono\";"
+            - generic [ref=e142]:
+              - generic [ref=e143]: "3"
+              - text: "src: url(\"https://assets.codepen.io/7558/PPSupplyMono-Regular.ttf\")"
+            - generic [ref=e144]:
+              - generic [ref=e145]: "4"
+              - text: format("truetype");
+            - generic [ref=e146]:
+              - generic [ref=e147]: "5"
+              - text: "font-weight: normal;"
+            - generic [ref=e148]:
+              - generic [ref=e149]: "6"
+              - text: "font-style: normal;"
+            - generic [ref=e150]:
+              - generic [ref=e151]: "7"
+              - text: "font-display: swap;"
+            - generic [ref=e152]:
+              - generic [ref=e153]: "8"
+              - text: "}"
+            - generic [ref=e155]: "9"
+            - generic [ref=e156]:
+              - generic [ref=e157]: "10"
+              - text: "*,"
+            - generic [ref=e158]:
+              - generic [ref=e159]: "11"
+              - text: "*::after,"
+            - generic [ref=e160]:
+              - generic [ref=e161]: "12"
+              - generic [ref=e163] [cursor=pointer]: ▾
+              - text: "*::before {"
+            - generic [ref=e164]:
+              - generic [ref=e165]: "13"
+              - text: "margin: 0;"
+            - generic [ref=e166]:
+              - generic [ref=e167]: "14"
+              - text: "padding: 0;"
+            - generic [ref=e168]:
+              - generic [ref=e169]: "15"
+              - text: "box-sizing: border-box;"
+            - generic [ref=e170]:
+              - generic [ref=e171]: "16"
+              - text: "}"
+            - generic [ref=e173]: "17"
+            - generic [ref=e174]:
+              - generic [ref=e175]: "18"
+              - generic [ref=e177] [cursor=pointer]: ▾
+              - text: ":root {"
+            - generic [ref=e178]:
+              - generic [ref=e179]: "19"
+              - text: "--color--background: rgb(60, 60, 60);"
+            - generic [ref=e180]:
+              - generic [ref=e181]: "20"
+              - text: "--color--foreground: #c4d5bc;"
+            - generic [ref=e182]:
+              - generic [ref=e183]: "21"
+              - text: "--color--accent: rgb(170, 170, 170);"
+            - generic [ref=e184]:
+              - generic [ref=e185]: "22"
+              - text: "--font-primary: \"PPSupplyMono\", \"Courier New\", monospace;"
+      - generic "Double-click to expand." [ref=e190]:
+        - heading "JS" [level=2]:
+          - img
+          - generic: JS
+      - generic [ref=e191]:
+        - generic [ref=e192]:
+          - heading [level=2] [ref=e194]
+          - generic [ref=e195]:
+            - button "Open JS Settings" [ref=e196] [cursor=pointer]:
+              - img
+            - button "JS Options" [ref=e197] [cursor=pointer]:
+              - generic [ref=e198]: JS Options
+              - img
+        - generic [ref=e200]:
+          - textbox "JavaScript Code Editor" [ref=e201]
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]: "1"
+              - text: import * as THREE from "https://esm.sh/three@0.177.0";
+            - generic [ref=e209]:
+              - generic [ref=e210]: "2"
+              - text: "import { EffectComposer } from \"https://esm.sh/three@0.177.0/examples/jsm/postprocessing/EffectComposer.js\";"
+            - generic [ref=e211]:
+              - generic [ref=e212]: "3"
+              - text: "import { RenderPass } from \"https://esm.sh/three@0.177.0/examples/jsm/postprocessing/RenderPass.js\";"
+            - generic [ref=e213]:
+              - generic [ref=e214]: "4"
+              - text: "import { ShaderPass } from \"https://esm.sh/three@0.177.0/examples/jsm/postprocessing/ShaderPass.js\";"
+            - generic [ref=e215]:
+              - generic [ref=e216]: "5"
+              - text: "import { Pane } from \"https://cdn.skypack.dev/tweakpane@4.0.4\";"
+            - generic [ref=e218]: "6"
+            - generic [ref=e219]:
+              - generic [ref=e220]: "7"
+              - generic [ref=e222] [cursor=pointer]: ▾
+              - text: "(function () {"
+            - generic [ref=e223]:
+              - generic [ref=e224]: "8"
+              - text: "\"use strict\";"
+            - generic [ref=e226]: "9"
+            - generic [ref=e227]:
+              - generic [ref=e228]: "10"
+              - generic [ref=e230] [cursor=pointer]: ▾
+              - text: "const supportsWebGL = () => {"
+            - generic [ref=e231]:
+              - generic [ref=e232]: "11"
+              - generic [ref=e234] [cursor=pointer]: ▾
+              - text: "try {"
+            - generic [ref=e235]:
+              - generic [ref=e236]: "12"
+              - text: const c = document.createElement("canvas");
+            - generic [ref=e237]:
+              - generic [ref=e238]: "13"
+              - text: return !!(
+            - generic [ref=e239]:
+              - generic [ref=e240]: "14"
+              - text: window.WebGLRenderingContext &&
+            - generic [ref=e241]:
+              - generic [ref=e242]: "15"
+              - text: (c.getContext("webgl") || c.getContext("experimental-webgl"))
+            - generic [ref=e243]:
+              - generic [ref=e244]: "16"
+              - text: );
+            - generic [ref=e245]:
+              - generic [ref=e246]: "17"
+              - generic [ref=e248] [cursor=pointer]: ▾
+              - text: "} catch {"
+            - generic [ref=e249]:
+              - generic [ref=e250]: "18"
+              - text: return false;
+    - generic [ref=e257]:
+      - iframe [ref=e259]:
+        - generic [active] [ref=f1e1]:
+          - generic [ref=f1e3]:
+            - paragraph [ref=f1e4]:
+              - text: ENTER EXPERIENCE
+              - text: WITH AUDIO
+            - button "START" [ref=f1e5] [cursor=pointer]
+          - paragraph [ref=f1e6]: THE ARCHIVE COLLECTS RECORDS OF ABANDONED WORLDS AND LOST TECHNOLOGIES, WAITING TO BE DISCOVERED.
+          - navigation [ref=f1e7]:
+            - link "_DATA VAULTS" [ref=f1e8] [cursor=pointer]:
+              - /url: "#"
+            - link "_DEEP SPACE" [ref=f1e9] [cursor=pointer]:
+              - /url: "#"
+            - link "_FORBIDDEN ZONES" [ref=f1e10] [cursor=pointer]:
+              - /url: "#"
+            - link "_EXODUS LOGS" [ref=f1e11] [cursor=pointer]:
+              - /url: "#"
+          - paragraph [ref=f1e13]:
+            - text: "Err: [404 - SIGNAL LOST]"
+            - text: "SYSTEM TIME: CYCLE 2187.42"
+            - text: PRESS 'H' TO TOGGLE REFRACTION CONTROLS
+          - paragraph [ref=f1e14]:
+            - text: "PERFORMANCE ANALYSIS:"
+            - text: FPS
+            - text: "OPTICAL REFRACTION ENGINE: ONLINE"
+            - text: "ACCESS LEVEL: RESTRICTED."
+            - text: "TRACE INITIATED: SOURCE UNKNOWN."
+          - paragraph [ref=f1e15]: _Uplink Pending...
+          - generic [ref=f1e16]:
+            - text: THE VAULT RETAINS ECHOES OF CIVILIZATIONS ERASED BY TIME
+            - text: DEAD SYSTEMS. BROKEN SIGNALS. MYTHS WRITTEN IN CODE.
+      - text: ">"
+  - contentinfo [ref=e260]:
+    - generic [ref=e261]:
+      - img [ref=e263]
+      - button "Fork" [ref=e264] [cursor=pointer]:
+        - img
+        - text: Fork
+      - button "Embed" [ref=e265] [cursor=pointer]
+      - button "Export" [ref=e267] [cursor=pointer]
+      - button "Share" [ref=e269] [cursor=pointer]
+    - generic [ref=e270]:
+      - button "Console" [ref=e271] [cursor=pointer]
+      - button "Assets" [ref=e272] [cursor=pointer]
+      - button "Comments" [ref=e273] [cursor=pointer]
+      - button "Shortcuts" [ref=e274] [cursor=pointer]
+  - text: Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl Ctrl
+```

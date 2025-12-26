@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Glass Lens Effect with Sound FX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="error-message" id="errorMessage"></div>
+  <div class="fallback-bg" id="fallbackBg"></div>
+
+  <div class="audio-enable">
+    <p>ARCHUB'A HOŞGELDİN.<br />EN İYİ DENEYİM İÇİN KULAKLIK KULLANIN. <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-headphones-filled" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 18a3 3 0 0 1 -2.824 2.995l-.176 .005h-1a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-3a3 3 0 0 1 2.824 -2.995l.176 -.005h1c.351 0 .688 .06 1 .171v-.171a7 7 0 0 0 -13.996 -.24l-.004 .24v.17c.25 -.088 .516 -.144 .791 -.163l.209 -.007h1a3 3 0 0 1 2.995 2.824l.005 .176v3a3 3 0 0 1 -2.824 2.995l-.176 .005h-1a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-3a3 3 0 0 1 2.824 -2.995l.176 -.005c.351 0 .688 .06 1 .171v-.171a5 5 0 0 1 9.995 -.24l.005 .24v.17c.25 -.088 .516 -.144 .791 -.163l.209 -.007h1a3 3 0 0 1 2.995 2.824l.005 .176v3z" fill="currentColor" stroke-width="0"/></svg></p>
+    <button type="button" class="enable-button" id="enableBtn">ENTER</button>
+  </div>
+
+  <div class="preloader" id="preloader">
+    <span id="counter">[000]</span>
+  </div>
+
+  <canvas id="canvas"></canvas>
+  <canvas id="noise" class="noise"></canvas>
+  
+  <!-- Custom Crosshair -->
+  <div class="crosshair" id="crosshair">
+    <div class="crosshair-line crosshair-line-h"></div>
+    <div class="crosshair-line crosshair-line-v"></div>
+    <div class="crosshair-dot"></div>
+  </div>
+
+  <p class="text-element description">ŞÖYLE DÜŞÜN: HER FİLMİN SONUNDA ZAYIFLAR KAZANIR.</p>
+
+  <nav class="text-element nav-links">
+    <a href="#">YENİ BÖLGE EKLE</a>
+    <a href="#">BÖLGELER</a>
+    <a href="#">DIŞ KAYNAKLAR</a>
+    <a href="#">TIER LIST</a>
+  </nav>
+
+  <div class="text-element footer">
+    <p>Err: [404 - SIGNAL LOST]<br />
+      SYSTEM TIME: CYCLE 2187.42<br />
+      <span style="opacity: 0.7; font-size: 0.6rem;">EN İYİYİ FARZ ET, EN KÖTÜYE HAZIRLAN.</span>
+    </p>
+  </div>
+
+  <p class="text-element division">
+    PERFORMANCE ANALYSIS: <span id="fpsCounter"></span> FPS<br>
+    OPTICAL REFRACTION ENGINE: ONLINE<br>
+    ACCESS LEVEL: RESTRICTED.<br>
+    TRACE INITIATED: SOURCE UNKNOWN.
+  </p>
+
+  <p class="text-element signal">_BÖLGELER HAZIRLANIYOR...</p>
+
+  <div class="text-element central-text">
+    ARCHUB'A HOŞGELDİN.<br>
+    MADE BY THERWN.
+  </div>
+
+  <div class="logo-container">
+    <img src="assets/logo.svg" alt="ARCHUB Logo" class="logo">
+  </div>
+
+  <!-- Bölgeler Pop-up -->
+  <div class="modal-overlay" id="regionsModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">BÖLGELER</h2>
+        <button class="modal-close" id="regionsModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="loot-filters">
+          <div class="search-box">
+            <input type="text" id="regionsSearchInput" class="search-input" placeholder="Bölge ara...">
+            <span class="search-icon">🔍</span>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Harita:</label>
+            <select id="regionsMapFilter" class="filter-select">
+              <option value="">Tüm Haritalar</option>
+              <option value="Baraj">Baraj</option>
+              <option value="Uzay Limanı">Uzay Limanı</option>
+              <option value="Gömülü Şehir">Gömülü Şehir</option>
+              <option value="Mavi Kapı">Mavi Kapı</option>
+              <option value="Stella Montis">Stella Montis</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="loot-regions-list" id="regionsList">
+          <div class="empty-state">
+            <p>Henüz bölge eklenmemiş.</p>
+            <p class="empty-hint">Yeni bölge eklemek için "YENİ BÖLGE EKLE" menüsünü kullanın.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier List Pop-up -->
+  <div class="modal-overlay" id="tierListModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">TIER LIST</h2>
+        <button class="modal-close" id="tierListModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="tier-list-actions">
+          <button class="action-btn submit-btn" id="tierListAddBtn">YENİ EKLE</button>
+        </div>
+        
+        <div class="loot-regions-list" id="tierListItems">
+          <div class="empty-state">
+            <p>Henüz tier list öğesi eklenmemiş.</p>
+            <p class="empty-hint">Yeni öğe eklemek için "YENİ EKLE" butonunu kullanın.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier List Ekleme Pop-up -->
+  <div class="modal-overlay" id="tierListAddModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">YENİ TIER LIST EKLE</h2>
+        <button class="modal-close" id="tierListAddModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form class="modal-form" id="tierListAddForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="tierListTitle" class="field-label">
+                <span class="label-text">BAŞLIK</span>
+                <span class="label-line"></span>
+              </label>
+              <input type="text" id="tierListTitle" name="tierListTitle" class="form-input" placeholder="Tier list başlığını girin" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="tierListCategory" class="field-label">
+                <span class="label-text">KATEGORİ</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="select-wrapper">
+                <select id="tierListCategory" name="tierListCategory" class="form-select" required>
+                  <option value="">Kategori seçiniz</option>
+                  <option value="Loot">Loot</option>
+                  <option value="Blueprint">Blueprint</option>
+                  <option value="Görev">Görev</option>
+                </select>
+                <span class="select-arrow">▼</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="tierListDescription" class="field-label">
+                <span class="label-text">AÇIKLAMA</span>
+                <span class="label-line"></span>
+              </label>
+              <textarea id="tierListDescription" name="tierListDescription" class="form-textarea" rows="4" placeholder="Tier list açıklaması yazın"></textarea>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="field-label">
+                <span class="label-text">GÖRSEL</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="file-upload-area">
+                <input type="file" id="tierListImage" name="tierListImage" accept="image/*" class="form-file-input">
+                <button type="button" class="file-upload-btn" id="tierListImageUploadBtn">
+                  <span class="upload-icon">📁</span>
+                  <span class="upload-text">Görsel Seç</span>
+                </button>
+                <span class="file-name-display" id="tierListImageFileName">Dosya seçilmedi</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="action-btn cancel-btn" id="tierListAddCancelBtn">İPTAL</button>
+            <button type="submit" class="action-btn submit-btn">KAYDET</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dış Kaynaklar Pop-up -->
+  <div class="modal-overlay" id="externalResourcesModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">DIŞ KAYNAKLAR</h2>
+        <button class="modal-close" id="externalResourcesModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="tier-list-actions">
+          <button class="action-btn submit-btn" id="externalResourcesAddBtn">YENİ EKLE</button>
+        </div>
+        
+        <div class="loot-regions-list" id="externalResourcesItems">
+          <div class="empty-state">
+            <p>Henüz dış kaynak eklenmemiş.</p>
+            <p class="empty-hint">Yeni kaynak eklemek için "YENİ EKLE" butonunu kullanın.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bölge Detay Pop-up -->
+  <div class="modal-overlay" id="regionDetailModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title" id="regionDetailTitle">BÖLGE DETAYI</h2>
+        <button class="modal-close" id="regionDetailModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="region-detail-content" id="regionDetailContent">
+          <!-- Detay içeriği buraya dinamik olarak eklenecek -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dış Kaynaklar Ekleme Pop-up -->
+  <div class="modal-overlay" id="externalResourcesAddModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">YENİ DIŞ KAYNAK EKLE</h2>
+        <button class="modal-close" id="externalResourcesAddModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form class="modal-form" id="externalResourcesAddForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="externalResourceTitle" class="field-label">
+                <span class="label-text">BAŞLIK</span>
+                <span class="label-line"></span>
+              </label>
+              <input type="text" id="externalResourceTitle" name="externalResourceTitle" class="form-input" placeholder="Dış kaynak başlığını girin" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="externalResourceCategory" class="field-label">
+                <span class="label-text">KATEGORİ</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="select-wrapper">
+                <select id="externalResourceCategory" name="externalResourceCategory" class="form-select" required>
+                  <option value="">Kategori seçiniz</option>
+                  <option value="Loot">Loot</option>
+                  <option value="Blueprint">Blueprint</option>
+                  <option value="Görev">Görev</option>
+                </select>
+                <span class="select-arrow">▼</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="externalResourceDescription" class="field-label">
+                <span class="label-text">AÇIKLAMA</span>
+                <span class="label-line"></span>
+              </label>
+              <textarea id="externalResourceDescription" name="externalResourceDescription" class="form-textarea" rows="4" placeholder="Dış kaynak açıklaması yazın"></textarea>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="action-btn cancel-btn" id="externalResourcesAddCancelBtn">İPTAL</button>
+            <button type="submit" class="action-btn submit-btn">KAYDET</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pop-up Modal - Yeni Tasarım -->
+  <div class="modal-overlay" id="newRegionModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title">YENİ BÖLGE EKLE</h2>
+        <button class="modal-close" id="modalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form class="modal-form" id="newRegionForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="regionName" class="field-label">
+                <span class="label-text">BÖLGE ADI</span>
+                <span class="label-line"></span>
+              </label>
+              <input type="text" id="regionName" name="regionName" class="form-input" placeholder="Bölge adını girin" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="regionCategory" class="field-label">
+                <span class="label-text">KATEGORİ</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="select-wrapper">
+                <select id="regionCategory" name="regionCategory" class="form-select" required>
+                  <option value="">Kategori seçiniz</option>
+                  <option value="Loot">Loot</option>
+                  <option value="Blueprint">Blueprint</option>
+                  <option value="Görev">Görev</option>
+                </select>
+                <span class="select-arrow">▼</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="regionMap" class="field-label">
+                <span class="label-text">HARİTA</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="select-wrapper">
+                <select id="regionMap" name="regionMap" class="form-select" required>
+                  <option value="">Harita seçiniz</option>
+                  <option value="Baraj">Baraj</option>
+                  <option value="Uzay Limanı">Uzay Limanı</option>
+                  <option value="Gömülü Şehir">Gömülü Şehir</option>
+                  <option value="Mavi Kapı">Mavi Kapı</option>
+                  <option value="Stella Montis">Stella Montis</option>
+                </select>
+                <span class="select-arrow">▼</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="regionDescription" class="field-label">
+                <span class="label-text">AÇIKLAMA</span>
+                <span class="label-line"></span>
+              </label>
+              <textarea id="regionDescription" name="regionDescription" class="form-textarea" rows="4" placeholder="Bölge hakkında açıklama yazın"></textarea>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="field-label">
+                <span class="label-text">GÖRSEL</span>
+                <span class="label-line"></span>
+              </label>
+              <div class="file-upload-area">
+                <input type="file" id="regionImage" name="regionImage" accept="image/*" class="form-file-input">
+                <button type="button" class="file-upload-btn" id="imageUploadBtn">
+                  <span class="upload-icon">📁</span>
+                  <span class="upload-text">Görsel Seç</span>
+                </button>
+                <span class="file-name-display" id="imageFileName">Dosya seçilmedi</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="action-btn cancel-btn" id="modalCancelBtn">İPTAL</button>
+            <button type="submit" class="action-btn submit-btn">KAYDET</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <audio id="startClickSound" preload="auto">
+    <source src="https://assets.codepen.io/7558/preloader-2s-001.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="preloaderSound" preload="auto">
+    <source src="https://assets.codepen.io/7558/preloader-3s-002.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="hoverSound" preload="auto">
+    <source src="https://assets.codepen.io/7558/preloader-2s-001.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Background music will be created dynamically by script.js -->
+
+  <!-- External Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://assets.codepen.io/16327/SplitText3.min.js"></script>
+  <script src="https://assets.codepen.io/16327/CustomEase.min.js"></script>
+  
+  <!-- Load script.js with dynamic import to avoid CORS issues -->
+  <script type="module">
+    // Dynamic import to load script.js as a module
+    import('./script.js').catch(err => {
+      console.error('Failed to load script.js:', err);
+      document.getElementById('errorMessage').textContent = 'Failed to load script. Please use a local server (e.g., Live Server in VS Code) or Python: python -m http.server';
+      document.getElementById('errorMessage').style.display = 'block';
+    });
+  </script>
+  
+  <!-- Debug: App'in yüklendiğini kontrol et -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (window.App) {
+          console.log('✓ App loaded successfully');
+          const btn = document.getElementById('enableBtn');
+          if (btn) {
+            console.log('✓ START button found');
+            // Butonun tıklanabilir olduğunu test et
+            btn.addEventListener('click', () => {
+              console.log('✓ Button click event fired');
+            });
+          } else {
+            console.error('✗ START button NOT found!');
+          }
+        } else {
+          console.error('✗ App NOT loaded! Check script.js for errors.');
+          console.log('Tip: If you see CORS errors, use a local server:');
+          console.log('  - VS Code: Install "Live Server" extension');
+          console.log('  - Python: python -m http.server 8000');
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>
+
