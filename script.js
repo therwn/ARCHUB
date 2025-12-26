@@ -1622,14 +1622,7 @@ void main(){
     },
 
     setupKeyboardControls() {
-      // CTRL + H ve H tuşu kombinasyonlarını engelle
-      document.addEventListener("keydown", (e) => {
-        if (e.key.toLowerCase() === "h" || (e.ctrlKey && e.key.toLowerCase() === "h")) {
-          e.preventDefault();
-          e.stopPropagation();
-          // Pane açılmasını engelle
-        }
-      }, true);
+      // H tuşu artık engellenmiyor, Tweakpane kontrol paneli için kullanılabilir
     },
 
     togglePane() {
