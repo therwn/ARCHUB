@@ -2186,7 +2186,12 @@ void main(){
       try {
         const response = await fetch('/api/tier-list');
         if (!response.ok) throw new Error('Failed to fetch tier list');
-        this.tierListItems = await response.json();
+        const data = await response.json();
+        // MongoDB ObjectId'yi string'e çevir
+        this.tierListItems = data.map(item => ({
+          ...item,
+          id: item.id || item._id || item.id?.toString()
+        }));
         this.renderTierListItems();
       } catch (error) {
         console.error('Error fetching tier list:', error);
@@ -2212,6 +2217,8 @@ void main(){
         });
         if (!response.ok) throw new Error('Failed to create tier list item');
         const newItem = await response.json();
+        // MongoDB ObjectId'yi string'e çevir
+        newItem.id = newItem.id || newItem._id || newItem.id?.toString();
         this.tierListItems.push(newItem);
         this.renderTierListItems();
         return newItem;
@@ -2229,14 +2236,18 @@ void main(){
     
     async updateTierListItem(id, itemData) {
       try {
-        const response = await fetch(`/api/tier-list/${id}`, {
+        // ID'yi string'e çevir (MongoDB ObjectId için)
+        const idStr = id?.toString() || id;
+        const response = await fetch(`/api/tier-list/${idStr}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(itemData)
         });
         if (!response.ok) throw new Error('Failed to update tier list item');
         const updatedItem = await response.json();
-        const index = this.tierListItems.findIndex(i => i.id === id);
+        // MongoDB ObjectId'yi string'e çevir
+        updatedItem.id = updatedItem.id || updatedItem._id || updatedItem.id?.toString();
+        const index = this.tierListItems.findIndex(i => (i.id?.toString() || i.id) === idStr || i._id?.toString() === idStr);
         if (index !== -1) {
           this.tierListItems[index] = updatedItem;
         }
@@ -2245,7 +2256,7 @@ void main(){
       } catch (error) {
         console.error('Error updating tier list item:', error);
         // Fallback to localStorage
-        const index = this.tierListItems.findIndex(i => i.id === id);
+        const index = this.tierListItems.findIndex(i => i.id === id || i.id?.toString() === id?.toString());
         if (index !== -1) {
           this.tierListItems[index] = { ...this.tierListItems[index], ...itemData };
           localStorage.setItem("archub_tierlist", JSON.stringify(this.tierListItems));
@@ -2285,7 +2296,12 @@ void main(){
       try {
         const response = await fetch('/api/external-resources');
         if (!response.ok) throw new Error('Failed to fetch external resources');
-        this.externalResources = await response.json();
+        const data = await response.json();
+        // MongoDB ObjectId'yi string'e çevir
+        this.externalResources = data.map(resource => ({
+          ...resource,
+          id: resource.id || resource._id || resource.id?.toString()
+        }));
         this.renderExternalResources();
       } catch (error) {
         console.error('Error fetching external resources:', error);
@@ -2314,6 +2330,8 @@ void main(){
         });
         if (!response.ok) throw new Error('Failed to create external resource');
         const newResource = await response.json();
+        // MongoDB ObjectId'yi string'e çevir
+        newResource.id = newResource.id || newResource._id || newResource.id?.toString();
         this.externalResources.push(newResource);
         this.renderExternalResources();
         return newResource;
@@ -2331,14 +2349,18 @@ void main(){
     
     async updateExternalResource(id, resourceData) {
       try {
-        const response = await fetch(`/api/external-resources/${id}`, {
+        // ID'yi string'e çevir (MongoDB ObjectId için)
+        const idStr = id?.toString() || id;
+        const response = await fetch(`/api/external-resources/${idStr}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(resourceData)
         });
         if (!response.ok) throw new Error('Failed to update external resource');
         const updatedResource = await response.json();
-        const index = this.externalResources.findIndex(r => r.id === id);
+        // MongoDB ObjectId'yi string'e çevir
+        updatedResource.id = updatedResource.id || updatedResource._id || updatedResource.id?.toString();
+        const index = this.externalResources.findIndex(r => (r.id?.toString() || r.id) === idStr || r._id?.toString() === idStr);
         if (index !== -1) {
           this.externalResources[index] = updatedResource;
         }
@@ -2347,7 +2369,7 @@ void main(){
       } catch (error) {
         console.error('Error updating external resource:', error);
         // Fallback to localStorage
-        const index = this.externalResources.findIndex(r => r.id === id);
+        const index = this.externalResources.findIndex(r => r.id === id || r.id?.toString() === id?.toString());
         if (index !== -1) {
           this.externalResources[index] = { ...this.externalResources[index], ...resourceData };
           localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
@@ -2358,16 +2380,18 @@ void main(){
     
     async deleteExternalResourceFromAPI(id) {
       try {
-        const response = await fetch(`/api/external-resources/${id}`, {
+        // ID'yi string'e çevir (MongoDB ObjectId için)
+        const idStr = id?.toString() || id;
+        const response = await fetch(`/api/external-resources/${idStr}`, {
           method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete external resource');
-        this.externalResources = this.externalResources.filter(r => r.id !== id);
+        this.externalResources = this.externalResources.filter(r => (r.id?.toString() || r.id) !== idStr && r._id?.toString() !== idStr);
         this.renderExternalResources();
       } catch (error) {
         console.error('Error deleting external resource:', error);
         // Fallback to localStorage
-        this.externalResources = this.externalResources.filter(r => r.id !== id);
+        this.externalResources = this.externalResources.filter(r => r.id !== id && r.id?.toString() !== id?.toString());
         localStorage.setItem("archub_external_resources", JSON.stringify(this.externalResources));
         this.renderExternalResources();
       }
