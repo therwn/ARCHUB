@@ -596,6 +596,9 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
               this.onMusicEnd();
             });
             this.isBackgroundPlaying = true;
+            if (!this.isMusicMuted) {
+              this.updateAudioWave(true);
+            }
           } else if (this.musicFiles.length === 0) {
             console.warn("No music files available to play");
           }
