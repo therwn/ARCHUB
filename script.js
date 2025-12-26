@@ -2123,7 +2123,7 @@ void main(){
       const form = document.getElementById("externalResourcesAddForm");
       if (form && !form.hasAttribute('data-listener-added')) {
         form.setAttribute('data-listener-added', 'true');
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           e.stopPropagation(); // Event'in yayılmasını durdur
           
