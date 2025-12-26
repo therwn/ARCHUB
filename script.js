@@ -1761,9 +1761,16 @@ void main(){
       const listContainer = document.getElementById("externalResourcesItems");
       if (!listContainer) return;
 
-      // Debug: Kaç tane item var?
-      console.log('External Resources Count:', this.externalResources.length);
-      console.log('External Resources:', this.externalResources);
+      // Önce duplicate'leri temizle ve array'i güncelle
+      const uniqueItems = this.externalResources.filter((item, index, self) => 
+        index === self.findIndex(t => t.id === item.id)
+      );
+      
+      // Eğer duplicate varsa array'i güncelle ve kaydet
+      if (uniqueItems.length !== this.externalResources.length) {
+        this.externalResources = uniqueItems;
+        this.saveExternalResourcesToStorage();
+      }
 
       if (this.externalResources.length === 0) {
         listContainer.innerHTML = `
@@ -1778,14 +1785,8 @@ void main(){
       // Önce mevcut içeriği temizle
       listContainer.innerHTML = '';
       
-      // Sonra kartları oluştur - sadece unique ID'lere sahip itemlar
-      const uniqueItems = this.externalResources.filter((item, index, self) => 
-        index === self.findIndex(t => t.id === item.id)
-      );
-      
-      console.log('Unique Items Count:', uniqueItems.length);
-      
-      const cardsHTML = uniqueItems.map(item => `
+      // Sonra kartları oluştur
+      const cardsHTML = this.externalResources.map(item => `
         <div class="loot-region-card" data-external-resource-id="${item.id}" data-external-resource-url="${item.url || ''}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
