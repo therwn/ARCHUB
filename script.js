@@ -1540,6 +1540,70 @@ void main(){
       }
     },
     
+    deleteRegion(regionId) {
+      this.regions = this.regions.filter(r => r.id !== regionId);
+      this.saveRegionsToStorage();
+      this.renderRegions();
+    },
+    
+    deleteTierListItem(itemId) {
+      this.tierListItems = this.tierListItems.filter(item => item.id !== itemId);
+      this.saveTierListToStorage();
+      this.renderTierListItems();
+    },
+    
+    deleteExternalResource(resourceId) {
+      this.externalResources = this.externalResources.filter(r => r.id !== resourceId);
+      this.saveExternalResourcesToStorage();
+      this.renderExternalResources();
+    },
+    
+    openImageLightbox(imageSrc) {
+      const modal = document.getElementById("imageLightboxModal");
+      const image = document.getElementById("lightboxImage");
+      if (!modal || !image) return;
+      
+      image.src = imageSrc;
+      modal.classList.add("active");
+      this.setupImageLightboxHandlers();
+    },
+    
+    closeImageLightbox() {
+      const modal = document.getElementById("imageLightboxModal");
+      if (modal) {
+        modal.classList.remove("active");
+      }
+    },
+    
+    setupImageLightboxHandlers() {
+      const modal = document.getElementById("imageLightboxModal");
+      if (!modal) return;
+
+      const closeBtn = modal.querySelector("#imageLightboxCloseBtn");
+      if (closeBtn && !closeBtn.dataset.listenerAdded) {
+        closeBtn.addEventListener("click", () => this.closeImageLightbox());
+        closeBtn.dataset.listenerAdded = "true";
+      }
+
+      if (!modal.dataset.listenerAdded) {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target.classList.contains('lightbox-image-container')) {
+            this.closeImageLightbox();
+          }
+        });
+        modal.dataset.listenerAdded = "true";
+      }
+      
+      // ESC tuşu ile kapatma
+      const escHandler = (e) => {
+        if (e.key === "Escape" && modal.classList.contains("active")) {
+          this.closeImageLightbox();
+          document.removeEventListener("keydown", escHandler);
+        }
+      };
+      document.addEventListener("keydown", escHandler);
+    },
+    
     openExternalResourcesModal() {
       const modal = document.getElementById("externalResourcesModal");
       if (modal) {
