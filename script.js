@@ -1366,6 +1366,80 @@ void main(){
       }
     },
     
+    openTierListDetailModal(tierListItem) {
+      const modal = document.getElementById("tierListDetailModal");
+      if (!modal || !tierListItem) return;
+      
+      // Mevcut açık modal'ı kontrol et
+      const existingModal = document.querySelector('.modal-overlay.active');
+      if (existingModal && existingModal.id !== 'tierListDetailModal') {
+        modal.classList.add('modal-nested');
+      }
+      
+      modal.classList.add("active");
+      
+      // Detay içeriğini doldur
+      const titleEl = document.getElementById("tierListDetailTitle");
+      const contentEl = document.getElementById("tierListDetailContent");
+      
+      if (titleEl) titleEl.textContent = tierListItem.title.toUpperCase();
+      
+      if (contentEl) {
+        contentEl.innerHTML = `
+          <div class="region-detail-section">
+            ${tierListItem.description ? `
+            <div class="detail-row detail-description">
+              <span class="detail-label">Açıklama:</span>
+              <p class="detail-value">${tierListItem.description}</p>
+            </div>
+            ` : ''}
+            ${tierListItem.image ? `
+            <div class="detail-row detail-image">
+              <span class="detail-label">Görsel:</span>
+              <div class="detail-image-container">
+                <img src="${tierListItem.image}" alt="${tierListItem.title}" class="detail-image">
+              </div>
+            </div>
+            ` : ''}
+            <div class="detail-row">
+              <span class="detail-label">Oluşturulma:</span>
+              <span class="detail-value">${new Date(tierListItem.createdAt).toLocaleDateString('tr-TR')}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      this.setupTierListDetailModalHandlers();
+    },
+    
+    closeTierListDetailModal() {
+      const modal = document.getElementById("tierListDetailModal");
+      if (modal) {
+        modal.classList.remove("active");
+        modal.classList.remove("modal-nested");
+      }
+    },
+    
+    setupTierListDetailModalHandlers() {
+      const modal = document.getElementById("tierListDetailModal");
+      if (!modal) return;
+
+      const closeBtn = modal.querySelector("#tierListDetailModalCloseBtn");
+      if (closeBtn && !closeBtn.dataset.listenerAdded) {
+        closeBtn.addEventListener("click", () => this.closeTierListDetailModal());
+        closeBtn.dataset.listenerAdded = "true";
+      }
+
+      if (!modal.dataset.listenerAdded) {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            this.closeTierListDetailModal();
+          }
+        });
+        modal.dataset.listenerAdded = "true";
+      }
+    },
+    
     openExternalResourcesModal() {
       const modal = document.getElementById("externalResourcesModal");
       if (modal) {
