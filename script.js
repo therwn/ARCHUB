@@ -1932,15 +1932,19 @@ void main(){
       if (!modal) return;
 
       const closeBtn = modal.querySelector("#externalResourcesAddModalCloseBtn");
-      if (closeBtn) {
+      if (closeBtn && !closeBtn.hasAttribute('data-listener-added')) {
+        closeBtn.setAttribute('data-listener-added', 'true');
         closeBtn.addEventListener("click", () => this.closeExternalResourcesAddModal());
       }
 
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          this.closeExternalResourcesAddModal();
-        }
-      });
+      if (!modal.hasAttribute('data-listener-added')) {
+        modal.setAttribute('data-listener-added', 'true');
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            this.closeExternalResourcesAddModal();
+          }
+        });
+      }
 
       const form = document.getElementById("externalResourcesAddForm");
       if (form && !form.hasAttribute('data-listener-added')) {
