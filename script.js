@@ -1411,8 +1411,8 @@ void main(){
               e.target.closest('.card-delete-btn') ||
               e.target.classList.contains('zoomable-image')) return;
           
-          const tierListId = parseInt(card.getAttribute('data-tier-list-id'));
-          const tierListItem = this.tierListItems.find(item => item.id === tierListId);
+          const tierListId = card.getAttribute('data-tier-list-id');
+          const tierListItem = this.tierListItems.find(item => (item.id?.toString() || item.id) === tierListId || item._id?.toString() === tierListId);
           if (tierListItem) {
             this.openTierListDetailModal(tierListItem);
           }
