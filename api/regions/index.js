@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       // Tüm bölgeleri getir
       const regions = await collection.find({}).sort({ created_at: -1 }).toArray();
-      return res.status(200).json(regions);
+      return res.status(200).json(regions.map(region => ({ ...region, id: region._id })));
     }
 
     if (req.method === 'POST') {

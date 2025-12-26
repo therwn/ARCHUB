@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'Region not found' });
       }
       
-      return res.status(200).json({ ...result.value, id: result.value._id });
+      return res.status(200).json({ ...result.value, id: result.value._id.toString() });
     }
 
     if (req.method === 'DELETE') {
