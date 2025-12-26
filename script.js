@@ -1096,6 +1096,7 @@ void main(){
           
           // Düzenleme modunda mı kontrol et
           const isEditMode = form.dataset.editMode === "true";
+          const isEditMode = form.dataset.editMode === "true";
           const editId = form.dataset.editId || null;
           
           const regionData = {
@@ -1107,8 +1108,6 @@ void main(){
           };
           
           // Edit mode flag'lerini temizle
-          const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
@@ -1523,8 +1522,6 @@ void main(){
           };
           
           // Edit mode flag'lerini temizle
-          const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
@@ -2152,8 +2149,6 @@ void main(){
           };
           
           // Edit mode flag'lerini temizle
-          const isEditMode = form.dataset.editMode === "true";
-          const editId = form.dataset.editId || null;
           delete form.dataset.editMode;
           delete form.dataset.editId;
           
