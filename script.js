@@ -1578,22 +1578,68 @@ void main(){
       }, 100);
     },
     
+    showConfirmModal(message, onConfirm) {
+      const modal = document.getElementById("confirmModal");
+      const messageEl = document.getElementById("confirmModalMessage");
+      if (!modal || !messageEl) return;
+      
+      messageEl.textContent = message;
+      modal.classList.add("active");
+      
+      // Event listener'ları temizle ve yeniden ekle
+      const confirmBtn = document.getElementById("confirmModalConfirmBtn");
+      const cancelBtn = document.getElementById("confirmModalCancelBtn");
+      const closeBtn = document.getElementById("confirmModalCloseBtn");
+      
+      // Eski listener'ları kaldır
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      const newCancelBtn = cancelBtn.cloneNode(true);
+      const newCloseBtn = closeBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+      closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+      
+      const closeModal = () => {
+        modal.classList.remove("active");
+      };
+      
+      newConfirmBtn.addEventListener("click", () => {
+        closeModal();
+        if (onConfirm) onConfirm();
+      });
+      
+      newCancelBtn.addEventListener("click", closeModal);
+      newCloseBtn.addEventListener("click", closeModal);
+      
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    },
+    
     deleteRegion(regionId) {
-      this.regions = this.regions.filter(r => r.id !== regionId);
-      this.saveRegionsToStorage();
-      this.renderRegions();
+      this.showConfirmModal("Bu bölgeyi silmek istediğinize emin misiniz?", () => {
+        this.regions = this.regions.filter(r => r.id !== regionId);
+        this.saveRegionsToStorage();
+        this.renderRegions();
+      });
     },
     
     deleteTierListItem(itemId) {
-      this.tierListItems = this.tierListItems.filter(item => item.id !== itemId);
-      this.saveTierListToStorage();
-      this.renderTierListItems();
+      this.showConfirmModal("Bu tier list öğesini silmek istediğinize emin misiniz?", () => {
+        this.tierListItems = this.tierListItems.filter(item => item.id !== itemId);
+        this.saveTierListToStorage();
+        this.renderTierListItems();
+      });
     },
     
     deleteExternalResource(resourceId) {
-      this.externalResources = this.externalResources.filter(r => r.id !== resourceId);
-      this.saveExternalResourcesToStorage();
-      this.renderExternalResources();
+      this.showConfirmModal("Bu dış kaynağı silmek istediğinize emin misiniz?", () => {
+        this.externalResources = this.externalResources.filter(r => r.id !== resourceId);
+        this.saveExternalResourcesToStorage();
+        this.renderExternalResources();
+      });
     },
     
     openImageLightbox(imageSrc) {
@@ -1715,6 +1761,10 @@ void main(){
       const listContainer = document.getElementById("externalResourcesItems");
       if (!listContainer) return;
 
+      // Debug: Kaç tane item var?
+      console.log('External Resources Count:', this.externalResources.length);
+      console.log('External Resources:', this.externalResources);
+
       if (this.externalResources.length === 0) {
         listContainer.innerHTML = `
           <div class="empty-state">
@@ -1728,8 +1778,14 @@ void main(){
       // Önce mevcut içeriği temizle
       listContainer.innerHTML = '';
       
-      // Sonra kartları oluştur
-      const cardsHTML = this.externalResources.map(item => `
+      // Sonra kartları oluştur - sadece unique ID'lere sahip itemlar
+      const uniqueItems = this.externalResources.filter((item, index, self) => 
+        index === self.findIndex(t => t.id === item.id)
+      );
+      
+      console.log('Unique Items Count:', uniqueItems.length);
+      
+      const cardsHTML = uniqueItems.map(item => `
         <div class="loot-region-card" data-external-resource-id="${item.id}" data-external-resource-url="${item.url || ''}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
@@ -1944,7 +2000,15 @@ void main(){
       try {
         const stored = localStorage.getItem("archub_external_resources");
         if (stored) {
-          this.externalResources = JSON.parse(stored);
+          const loaded = JSON.parse(stored);
+          // Duplicate'leri temizle - aynı ID'ye sahip itemların sadece birini tut
+          this.externalResources = loaded.filter((item, index, self) => 
+            index === self.findIndex(t => t.id === item.id)
+          );
+          // Eğer temizleme yapıldıysa tekrar kaydet
+          if (loaded.length !== this.externalResources.length) {
+            this.saveExternalResourcesToStorage();
+          }
         }
       } catch (e) {
         console.warn("LocalStorage'dan yükleme yapılamadı:", e);
