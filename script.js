@@ -1667,21 +1667,53 @@ void main(){
       if (!modal) return;
 
       const closeBtn = modal.querySelector("#externalResourcesModalCloseBtn");
-      if (closeBtn) {
+      if (closeBtn && !closeBtn.dataset.listenerAdded) {
         closeBtn.addEventListener("click", () => this.closeExternalResourcesModal());
+        closeBtn.dataset.listenerAdded = "true";
       }
 
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          this.closeExternalResourcesModal();
-        }
-      });
+      if (!modal.dataset.listenerAdded) {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            this.closeExternalResourcesModal();
+          }
+        });
+        modal.dataset.listenerAdded = "true";
+      }
 
       const addBtn = document.getElementById("externalResourcesAddBtn");
-      if (addBtn) {
+      if (addBtn && !addBtn.dataset.listenerAdded) {
         addBtn.addEventListener("click", () => {
           this.openExternalResourcesAddModal();
         });
+        addBtn.dataset.listenerAdded = "true";
+      }
+      
+      // Event delegation kullanarak kartlara ve silme butonlarına event listener ekle
+      const listContainer = document.getElementById("externalResourcesItems");
+      if (listContainer && !listContainer.dataset.listenerAdded) {
+        // Kartlara tıklama (event delegation)
+        listContainer.addEventListener('click', (e) => {
+          const card = e.target.closest('.loot-region-card[data-external-resource-id]');
+          if (!card) return;
+          
+          // Silme butonuna tıklanırsa
+          if (e.target.classList.contains('card-delete-btn')) {
+            e.stopPropagation();
+            const resourceId = parseInt(e.target.getAttribute('data-external-resource-id'));
+            if (confirm('Bu dış kaynağı silmek istediğinize emin misiniz?')) {
+              this.deleteExternalResource(resourceId);
+            }
+            return;
+          }
+          
+          // Kartın kendisine tıklanırsa linke git
+          const url = card.getAttribute('data-external-resource-url');
+          if (url && url.trim() !== '') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }
+        });
+        listContainer.dataset.listenerAdded = "true";
       }
     },
     
