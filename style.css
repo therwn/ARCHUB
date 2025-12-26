@@ -220,7 +220,7 @@ body.loading-active {
   position: relative;
   display: block;
   margin-bottom: 16px;
-  color: #C2D4BC;
+  color: #dedede;
   text-decoration: none;
   z-index: 1;
   padding: 4px 8px;
