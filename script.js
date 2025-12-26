@@ -2375,6 +2375,32 @@ void main(){
       }
     },
     
+    async fetchRegions() {
+      try {
+        const response = await fetch('/api/regions');
+        if (!response.ok) throw new Error('Failed to fetch regions');
+        const data = await response.json();
+        // MongoDB ObjectId'yi string'e çevir
+        this.regions = data.map(region => ({
+          ...region,
+          id: region.id || region._id || region.id?.toString()
+        }));
+        this.renderRegions();
+      } catch (error) {
+        console.error('Error fetching regions:', error);
+        // Fallback to localStorage
+        try {
+          const stored = localStorage.getItem("archub_regions");
+          if (stored) {
+            this.regions = JSON.parse(stored);
+            this.renderRegions();
+          }
+        } catch (e) {
+          console.warn("LocalStorage'dan yükleme yapılamadı:", e);
+        }
+      }
+    },
+    
     loadRegionsFromStorage() {
       try {
         const stored = localStorage.getItem("archub_regions");
