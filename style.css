@@ -1024,6 +1024,15 @@ body.loading-active {
   object-fit: contain;
 }
 
+/* Confirm Modal Styles */
+.confirm-message {
+  font-size: 0.9rem;
+  color: var(--color--foreground);
+  line-height: 1.6;
+  text-align: center;
+  margin: 1rem 0;
+}
+
 /* Bölge Detay Stilleri */
 .region-detail-content {
   display: flex;

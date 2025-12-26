@@ -1242,9 +1242,7 @@ void main(){
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const regionId = parseInt(btn.getAttribute('data-region-id'));
-          if (confirm('Bu bölgeyi silmek istediğinize emin misiniz?')) {
-            this.deleteRegion(regionId);
-          }
+          this.deleteRegion(regionId);
         });
       });
       
@@ -1378,9 +1376,7 @@ void main(){
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const tierListId = parseInt(btn.getAttribute('data-tier-list-id'));
-          if (confirm('Bu tier list öğesini silmek istediğinize emin misiniz?')) {
-            this.deleteTierListItem(tierListId);
-          }
+          this.deleteTierListItem(tierListId);
         });
       });
       
@@ -1650,8 +1646,8 @@ void main(){
       const modal = document.getElementById("externalResourcesModal");
       if (modal) {
         modal.classList.add("active");
-        this.renderExternalResources();
         this.setupExternalResourcesModalHandlers();
+        this.renderExternalResources();
       }
     },
     
@@ -1701,9 +1697,7 @@ void main(){
           if (e.target.classList.contains('card-delete-btn')) {
             e.stopPropagation();
             const resourceId = parseInt(e.target.getAttribute('data-external-resource-id'));
-            if (confirm('Bu dış kaynağı silmek istediğinize emin misiniz?')) {
-              this.deleteExternalResource(resourceId);
-            }
+            this.deleteExternalResource(resourceId);
             return;
           }
           
@@ -1731,7 +1725,11 @@ void main(){
         return;
       }
 
-      listContainer.innerHTML = this.externalResources.map(item => `
+      // Önce mevcut içeriği temizle
+      listContainer.innerHTML = '';
+      
+      // Sonra kartları oluştur
+      const cardsHTML = this.externalResources.map(item => `
         <div class="loot-region-card" data-external-resource-id="${item.id}" data-external-resource-url="${item.url || ''}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
@@ -1752,6 +1750,8 @@ void main(){
           </div>
         </div>
       `).join('');
+      
+      listContainer.innerHTML = cardsHTML;
     },
     
     openExternalResourcesAddModal() {
