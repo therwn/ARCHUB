@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       if (!resource) {
         return res.status(404).json({ error: 'External resource not found' });
       }
-      return res.status(200).json({ ...resource, id: resource._id });
+      return res.status(200).json({ ...resource, id: resource._id.toString() });
     }
 
     if (req.method === 'PUT') {

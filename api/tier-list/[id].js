@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       if (!item) {
         return res.status(404).json({ error: 'Tier list item not found' });
       }
-      return res.status(200).json({ ...item, id: item._id });
+      return res.status(200).json({ ...item, id: item._id.toString() });
     }
 
     if (req.method === 'PUT') {

@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       };
       
       const result = await collection.insertOne(resource);
-      const newResource = { ...resource, id: result.insertedId };
+      const newResource = { ...resource, _id: result.insertedId, id: result.insertedId.toString() };
       
       return res.status(201).json(newResource);
     }

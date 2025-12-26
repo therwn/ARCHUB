@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       };
       
       const result = await collection.insertOne(region);
-      const newRegion = { ...region, id: result.insertedId };
+      const newRegion = { ...region, _id: result.insertedId, id: result.insertedId.toString() };
       
       return res.status(201).json(newRegion);
     }
