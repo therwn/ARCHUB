@@ -354,13 +354,9 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
 
     waitForDependencies() {
       const chk = setInterval(() => {
-        // GSAP yüklendi mi kontrol et (SplitText opsiyonel)
+        // GSAP yüklendi mi kontrol et
         if (window.gsap) {
           clearInterval(chk);
-          // SplitText varsa trial uyarısını kapat
-          if (window.SplitText && window.gsap && window.gsap.config) {
-            window.gsap.config({ trialWarn: false });
-          }
           this.onDependenciesReady();
         }
       }, 100);
@@ -656,18 +652,8 @@ import { Pane } from "https://cdn.skypack.dev/tweakpane@4.0.4";
 
       gsap.set(containers.concat(".nav-links"), { opacity: 0 });
 
-      // SplitText yerine kendi fonksiyonumuzu kullan
-      let splits;
-      if (window.SplitText) {
-        // SplitText varsa kullan (trial versiyonu)
-        splits = containers.map(
-          (sel) =>
-            SplitText.create(sel, { type: "lines", linesClass: "line" }).lines
-        );
-      } else {
-        // Alternatif çözüm: kendi fonksiyonumuz
-        splits = containers.map((sel) => this.splitTextIntoLines(sel));
-      }
+      // Kendi splitTextIntoLines fonksiyonumuzu kullan (GSAP SplitText trial versiyonu kaldırıldı)
+      const splits = containers.map((sel) => this.splitTextIntoLines(sel));
       
       const [descLines, divLines, sigLines, centralLines, footerLines] = splits;
 
