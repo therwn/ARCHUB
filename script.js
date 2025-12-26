@@ -1703,10 +1703,7 @@ void main(){
         <div class="loot-region-card" data-external-resource-id="${item.id}">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
-            <div class="region-card-actions">
-              <span class="region-card-badge">${item.category}</span>
-              <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
-            </div>
+            <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1876,8 +1873,8 @@ void main(){
           const item = {
             id: Date.now(),
             title: data.externalResourceTitle,
-            category: data.externalResourceCategory,
             description: data.externalResourceDescription || "",
+            url: data.externalResourceUrl || "",
             createdAt: new Date().toISOString()
           };
           

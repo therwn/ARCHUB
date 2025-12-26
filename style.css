@@ -994,11 +994,15 @@ body.loading-active {
   border: 2px solid rgba(196, 213, 188, 0.2);
 }
 
+#imageLightboxModal {
+  z-index: 10000 !important;
+}
+
 #imageLightboxModal .modal-close {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  z-index: 10;
+  z-index: 10001;
   background: rgba(0, 0, 0, 0.7);
   border-radius: 50%;
   width: 40px;
