@@ -1183,10 +1183,13 @@ void main(){
       }
 
       listContainer.innerHTML = regionsToShow.map(region => `
-        <div class="loot-region-card" data-region-id="${region.id}" style="cursor: pointer;">
+        <div class="loot-region-card" data-region-id="${region.id}">
           <div class="region-card-header">
             <h3 class="region-card-title">${region.name}</h3>
-            <span class="region-card-badge">${region.category}</span>
+            <div class="region-card-actions">
+              <span class="region-card-badge">${region.category}</span>
+              <button class="card-delete-btn" data-region-id="${region.id}" title="Sil">×</button>
+            </div>
           </div>
           <div class="region-card-info">
             <div class="region-card-info-item">
@@ -1202,13 +1205,27 @@ void main(){
         </div>
       `).join('');
       
-      // Kartlara tıklama event'i ekle
+      // Kartlara tıklama event'i ekle (silme butonu hariç)
       listContainer.querySelectorAll('.loot-region-card').forEach(card => {
         card.addEventListener('click', (e) => {
+          // Silme butonuna tıklanırsa detay açılmasın
+          if (e.target.classList.contains('card-delete-btn')) return;
+          
           const regionId = parseInt(card.getAttribute('data-region-id'));
           const region = this.regions.find(r => r.id === regionId);
           if (region) {
             this.openRegionDetailModal(region);
+          }
+        });
+      });
+      
+      // Silme butonlarına event listener ekle
+      listContainer.querySelectorAll('.card-delete-btn[data-region-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const regionId = parseInt(btn.getAttribute('data-region-id'));
+          if (confirm('Bu bölgeyi silmek istediğinize emin misiniz?')) {
+            this.deleteRegion(regionId);
           }
         });
       });
@@ -1295,9 +1312,10 @@ void main(){
       }
 
       listContainer.innerHTML = this.tierListItems.map(item => `
-        <div class="loot-region-card" data-tier-list-id="${item.id}" style="cursor: pointer;">
+        <div class="loot-region-card" data-tier-list-id="${item.id}">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
+            <button class="card-delete-btn" data-tier-list-id="${item.id}" title="Sil">×</button>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1307,21 +1325,44 @@ void main(){
             ` : ''}
             ${item.image ? `
             <div class="region-card-image">
-              <img src="${item.image}" alt="${item.title}" style="max-width: 100%; height: auto; margin-top: 0.5rem;">
+              <img src="${item.image}" alt="${item.title}" class="zoomable-image" data-image-src="${item.image}" style="max-width: 100%; height: auto; margin-top: 0.5rem; cursor: zoom-in;">
             </div>
             ` : ''}
           </div>
         </div>
       `).join('');
       
-      // TierList kartlarına click event listener ekle
+      // TierList kartlarına click event listener ekle (silme butonu ve görsel hariç)
       listContainer.querySelectorAll('.loot-region-card[data-tier-list-id]').forEach(card => {
         card.addEventListener('click', (e) => {
+          // Silme butonuna veya görsele tıklanırsa detay açılmasın
+          if (e.target.classList.contains('card-delete-btn') || e.target.classList.contains('zoomable-image')) return;
+          
           const tierListId = parseInt(card.getAttribute('data-tier-list-id'));
           const tierListItem = this.tierListItems.find(item => item.id === tierListId);
           if (tierListItem) {
             this.openTierListDetailModal(tierListItem);
           }
+        });
+      });
+      
+      // Silme butonlarına event listener ekle
+      listContainer.querySelectorAll('.card-delete-btn[data-tier-list-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const tierListId = parseInt(btn.getAttribute('data-tier-list-id'));
+          if (confirm('Bu tier list öğesini silmek istediğinize emin misiniz?')) {
+            this.deleteTierListItem(tierListId);
+          }
+        });
+      });
+      
+      // Görsellere zoom event listener ekle
+      listContainer.querySelectorAll('.zoomable-image').forEach(img => {
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const imageSrc = img.getAttribute('data-image-src') || img.src;
+          this.openImageLightbox(imageSrc);
         });
       });
     },
@@ -1456,7 +1497,7 @@ void main(){
             <div class="detail-row detail-image">
               <span class="detail-label">Görsel:</span>
               <div class="detail-image-container">
-                <img src="${tierListItem.image}" alt="${tierListItem.title}" class="detail-image">
+                <img src="${tierListItem.image}" alt="${tierListItem.title}" class="detail-image zoomable-image" style="cursor: zoom-in; max-width: 100%; height: auto;">
               </div>
             </div>
             ` : ''}
@@ -1553,10 +1594,13 @@ void main(){
       }
 
       listContainer.innerHTML = this.externalResources.map(item => `
-        <div class="loot-region-card">
+        <div class="loot-region-card" data-external-resource-id="${item.id}">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
-            <span class="region-card-badge">${item.category}</span>
+            <div class="region-card-actions">
+              <span class="region-card-badge">${item.category}</span>
+              <button class="card-delete-btn" data-external-resource-id="${item.id}" title="Sil">×</button>
+            </div>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1564,9 +1608,25 @@ void main(){
               ${item.description}
             </div>
             ` : ''}
+            ${item.url ? `
+            <div class="region-card-url" style="margin-top: 0.5rem;">
+              <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: rgba(0, 255, 243, 0.8); text-decoration: none; font-size: 0.75rem;">${item.url}</a>
+            </div>
+            ` : ''}
           </div>
         </div>
       `).join('');
+      
+      // Silme butonlarına event listener ekle
+      listContainer.querySelectorAll('.card-delete-btn[data-external-resource-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const resourceId = parseInt(btn.getAttribute('data-external-resource-id'));
+          if (confirm('Bu dış kaynağı silmek istediğinize emin misiniz?')) {
+            this.deleteExternalResource(resourceId);
+          }
+        });
+      });
     },
     
     openExternalResourcesAddModal() {
