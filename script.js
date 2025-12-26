@@ -1795,6 +1795,30 @@ void main(){
       });
     },
     
+    editExternalResource(resourceId) {
+      const resource = this.externalResources.find(r => r.id === resourceId);
+      if (!resource) return;
+      
+      const modal = document.getElementById("externalResourcesAddModal");
+      if (!modal) return;
+      
+      modal.classList.add("active");
+      
+      // Form alanlarını doldur
+      document.getElementById("externalResourceTitle").value = resource.title || "";
+      document.getElementById("externalResourceDescription").value = resource.description || "";
+      document.getElementById("externalResourceUrl").value = resource.url || "";
+      
+      // Form'a edit mode flag'i ekle
+      const form = document.getElementById("externalResourcesAddForm");
+      if (form) {
+        form.dataset.editMode = "true";
+        form.dataset.editId = resourceId;
+      }
+      
+      this.setupExternalResourcesAddModalHandlers();
+    },
+    
     deleteExternalResource(resourceId) {
       this.showConfirmModal("Bu dış kaynağı silmek istediğinize emin misiniz?", () => {
         this.externalResources = this.externalResources.filter(r => r.id !== resourceId);
