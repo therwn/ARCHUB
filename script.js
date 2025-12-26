@@ -1236,10 +1236,9 @@ void main(){
       }
 
       listContainer.innerHTML = this.tierListItems.map(item => `
-        <div class="loot-region-card">
+        <div class="loot-region-card" data-tier-list-id="${item.id}" style="cursor: pointer;">
           <div class="region-card-header">
             <h3 class="region-card-title">${item.title}</h3>
-            <span class="region-card-badge">${item.category}</span>
           </div>
           <div class="region-card-info">
             ${item.description ? `
@@ -1255,6 +1254,17 @@ void main(){
           </div>
         </div>
       `).join('');
+      
+      // TierList kartlarına click event listener ekle
+      listContainer.querySelectorAll('.loot-region-card[data-tier-list-id]').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const tierListId = parseInt(card.getAttribute('data-tier-list-id'));
+          const tierListItem = this.tierListItems.find(item => item.id === tierListId);
+          if (tierListItem) {
+            this.openTierListDetailModal(tierListItem);
+          }
+        });
+      });
     },
     
     openTierListAddModal() {
@@ -1299,17 +1309,29 @@ void main(){
 
       const form = document.getElementById("tierListAddForm");
       if (form) {
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const formData = new FormData(form);
           const data = Object.fromEntries(formData.entries());
           
+          // Görseli base64'e çevir
+          let imageBase64 = null;
+          const fileInput = document.getElementById("tierListImage");
+          if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            imageBase64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          }
+          
           const item = {
             id: Date.now(),
             title: data.tierListTitle,
-            category: data.tierListCategory,
             description: data.tierListDescription || "",
-            image: data.tierListImage ? data.tierListImage.name : null,
+            image: imageBase64,
             createdAt: new Date().toISOString()
           };
           

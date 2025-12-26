@@ -157,24 +157,6 @@
           
           <div class="form-row">
             <div class="form-field">
-              <label for="tierListCategory" class="field-label">
-                <span class="label-text">KATEGORİ</span>
-                <span class="label-line"></span>
-              </label>
-              <div class="select-wrapper">
-                <select id="tierListCategory" name="tierListCategory" class="form-select" required>
-                  <option value="">Kategori seçiniz</option>
-                  <option value="Loot">Loot</option>
-                  <option value="Blueprint">Blueprint</option>
-                  <option value="Görev">Görev</option>
-                </select>
-                <span class="select-arrow">▼</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-field">
               <label for="tierListDescription" class="field-label">
                 <span class="label-text">AÇIKLAMA</span>
                 <span class="label-line"></span>
@@ -250,6 +232,26 @@
       
       <div class="modal-body">
         <div class="region-detail-content" id="regionDetailContent">
+          <!-- Detay içeriği buraya dinamik olarak eklenecek -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TierList Detay Pop-up -->
+  <div class="modal-overlay" id="tierListDetailModal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <div class="modal-header-line"></div>
+        <h2 class="modal-title" id="tierListDetailTitle">TIER LIST DETAYI</h2>
+        <button class="modal-close" id="tierListDetailModalCloseBtn">
+          <span class="close-line"></span>
+          <span class="close-line"></span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="region-detail-content" id="tierListDetailContent">
           <!-- Detay içeriği buraya dinamik olarak eklenecek -->
         </div>
       </div>
